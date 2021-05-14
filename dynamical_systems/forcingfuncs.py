@@ -38,19 +38,32 @@ class Gaussian():
         ## placeholder function to calculate weighted gaussian distribution
         ## will just multiply the weight to the normal evaluation.
         return self.weight * self.evaluate(x)
+
+
+def get_weights_from_forcing_functions(forcing_funcs):
     
+    """
+    //TODO:
+    CONVERT THE WEIGHT CALCULATION DONE BELO TO A function
+    Need to have higher priority.
+    """
+    pass
+    
+    
+     
 if __name__ == '__main__':
     
     
-    noBasis = 10
+    noBasis = 25
     psi = noBasis * [None]
     values = noBasis * [None]
     weight_values = noBasis * [None]
     
     
-    xvalues = np.linspace(-10,10,200)
+    xvalues = np.linspace(-15,15,2000)
     
-    centers,widths,weights =  np.arange(-5,5),np.random.randint(1,3,size=(noBasis))/3,np.random.rand(noBasis)
+    centers,widths,weights =  np.arange(-12,13),np.random.randint(1,3,size=(noBasis)) / 4 ,np.random.rand(noBasis)
+    
     for i in range(noBasis):
         
         psi[i] = Gaussian(widths[i],centers[i],weights[i])
@@ -82,9 +95,35 @@ if __name__ == '__main__':
         
     weight_gaussian = np.sum(weight_values,axis=1)
     plt.plot(xvalues,weight_gaussian ,label = 'weight_gaussian')
+    
+    
+    ## for some time we will assume that the forcing function is basically the weighted gaussian to check if the method that we are using works properly
+    ## we should get the weightd that we applied back.
+    
+    forcing_function = weight_gaussian
+    
+    PSI_matrix = np.empty(shape=(len(xvalues) , noBasis))
+    
+    for i in range(noBasis):
+        
+        PSI_matrix[:,i] = psi[i].evaluate(xvalues) * xvalues / np.sum(values,axis=1)
+    calculated_weights = np.linalg.pinv(PSI_matrix).dot(forcing_function)
+    print(calculated_weights)
+    print(weights)
+    
+    calc_psi = noBasis * [None]
+    calc_values = noBasis * [None]
+    calculated_weight_values = noBasis * [None]
+    for i in range(noBasis):
+        
+        calc_psi[i] = Gaussian(widths[i],centers[i],calculated_weights[i])
+        calc_values[i] = calc_psi[i].evaluate(xvalues)
+        calculated_weight_values[i] = calc_psi[i].weighted_evaluate(xvalues)
+    
+    calc_values = np.array(calc_values).T
+    calculated_weight_values = np.array(calculated_weight_values).T
+    calc_weight_gaussian = np.sum(calculated_weight_values,axis=1)
+    
+    plt.plot(xvalues,weight_gaussian ,'g|',label = 'calc_weight_gaussian')
     plt.legend()
     plt.show()
-        
-    
-
-
