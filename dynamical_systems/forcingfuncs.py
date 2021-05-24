@@ -40,14 +40,14 @@ class Gaussian():
         return self.weight * self.evaluate(x)
 
 
-def get_weights_from_forcing_functions(forcing_funcs,alpha_x,x_values,noBasis,plot = True, return_weights = False):
+def get_weights_from_forcing_functions(forcing_funcs,alpha_x,xvalues,noBasis,plot = True, return_weights = False):
     """ gets the weights required to match the forcing functions as required.\n
     
 
     Args: \n
         forcing_funcs (1D np array): the forciong function which needs to be approximated as weighted gaussians \n
         alpha_x (float): canonical system parameter\n
-        x_values (1D numpy array): values in time dimension\n
+        xvalues (1D numpy array): values in time dimension\n
         noBasis (int): no of basis functions to be used\n
         plot (bool): Value toplot the results. Defaults to True.\n
         return_weights (bool): return the weights as a numpy array. Defaults to False.\n
@@ -67,9 +67,13 @@ def get_weights_from_forcing_functions(forcing_funcs,alpha_x,x_values,noBasis,pl
         center[i] = np.exp(-alpha_x * (i-1) / (noBasis-1) )
     
     for i in range(noBasis -1): ## finding the width
-        width[i] = 1/( (center[i+1] - center[i]) * (center[i+1] - center[i]) )
-    
+        #width[i] =  (center[i+1] - center[i]) * (center[i+1] - center[i]) 
+        width[i] = noBasis**1.2 / center[i] / alpha_x
     width[-1] = width[-2]
+    
+    ## printing the centers and widths
+    print("centers\n",center)
+    print("\nwidths\n",width)
     
     for i in range(noBasis): ## evaluate the Gaussian at a particular x value.
         psi[i] = Gaussian(width[i],center[i])
@@ -96,7 +100,7 @@ def get_weights_from_forcing_functions(forcing_funcs,alpha_x,x_values,noBasis,pl
         import matplotlib.pyplot as plt
         
         plt.figure()
-        plt.title('Basis functions')
+        plt.title('Basis functions from function')
     
         for i in range(noBasis):
             plt.plot(xvalues,values[:,i])        
@@ -115,8 +119,18 @@ if __name__ == '__main__':
     ## if what to test is 1 test the other code. 
     
     if what_to_test == 0:
-        ## TODO: add tests to test the function get_weights_from_forcing_functions:
+        ## TODO: UPDATE: No erroes occurs but the position of the gauusians is still not oki for me.
         
+        total_time = 10 # total time in seconds        
+        from canonical import FirstOrderDynamicalSystems
+        
+        X_decay = FirstOrderDynamicalSystems(alpha=2,x0 = 1)
+        
+        x_values,timearray = X_decay.simulation(total_time)
+        forcing_function = np.zeros_like(timearray)
+        forcing_function[:] = 1
+        psi,weights = get_weights_from_forcing_functions(forcing_function,X_decay.alpha,x_values,50,True,return_weights = True)     
+    
         pass
     if what_to_test == 1:
         noBasis = 50
@@ -146,8 +160,8 @@ if __name__ == '__main__':
         plt.figure()
         plt.title('Basis functions')
         
-        for i in range(noBasis):
-            plt.plot(xvalues,values[:,i])
+        # for i in range(noBasis):
+        #     plt.plot(xvalues,values[:,i])
             
             
         plt.figure()
@@ -159,7 +173,7 @@ if __name__ == '__main__':
         
             
         weight_gaussian = np.sum(weight_values,axis=1)
-        plt.plot(xvalues,weight_gaussian ,label = 'weight_gaussian')
+        #plt.plot(xvalues,weight_gaussian ,label = 'weight_gaussian')
         
         
         ## for some time we will assume that the forcing function is basically the weighted gaussian to check if the method that we are using works properly
@@ -167,28 +181,37 @@ if __name__ == '__main__':
         
         forcing_function = weight_gaussian
         
-        PSI_matrix = np.empty(shape=(len(xvalues) , noBasis))
         
-        for i in range(noBasis):
+        # PSI_matrix = np.empty(shape=(len(xvalues) , noBasis))
+        
+        # for i in range(noBasis):
             
-            PSI_matrix[:,i] = psi[i].evaluate(xvalues) * xvalues / np.sum(values,axis=1)
-        calculated_weights = np.linalg.pinv(PSI_matrix).dot(forcing_function)
-        print(calculated_weights)
-        print(weights)
+        #     PSI_matrix[:,i] = psi[i].evaluate(xvalues) * xvalues / np.sum(values,axis=1)
+        # calculated_weights = np.linalg.pinv(PSI_matrix).dot(forcing_function)
+        # print(calculated_weights)
+        # print(weights)
         
-        calc_psi = noBasis * [None]
-        calc_values = noBasis * [None]
-        calculated_weight_values = noBasis * [None]
-        for i in range(noBasis):
+        # calc_psi = noBasis * [None]
+        # calc_values = noBasis * [None]
+        # calculated_weight_values = noBasis * [None]
+        # for i in range(noBasis):
             
-            calc_psi[i] = Gaussian(widths[i],centers[i],calculated_weights[i])
-            calc_values[i] = calc_psi[i].evaluate(xvalues)
-            calculated_weight_values[i] = calc_psi[i].weighted_evaluate(xvalues)
+        #     calc_psi[i] = Gaussian(widths[i],centers[i],calculated_weights[i])
+        #     calc_values[i] = calc_psi[i].evaluate(xvalues)
+        #     calculated_weight_values[i] = calc_psi[i].weighted_evaluate(xvalues)
         
-        calc_values = np.array(calc_values).T
-        calculated_weight_values = np.array(calculated_weight_values).T
-        calc_weight_gaussian = np.sum(calculated_weight_values,axis=1)
+        # calc_values = np.array(calc_values).T
+        # calculated_weight_values = np.array(calculated_weight_values).T
+        # calc_weight_gaussian = np.sum(calculated_weight_values,axis=1)
         
-        plt.plot(xvalues,weight_gaussian ,'g|',label = 'calc_weight_gaussian')
-        plt.legend()
-        plt.show()
+        # plt.plot(xvalues,weight_gaussian ,'g|',label = 'calc_weight_gaussian')
+        # plt.legend()
+        # plt.show()
+        
+        
+        ### testing the functiuon here as well...... as to isolate the effeect of centers and widths... and x_values..
+        
+        psi,weights = get_weights_from_forcing_functions(forcing_function,2,xvalues,20,True,return_weights = True)  
+        
+        ## we get an error still in the working focing function example.. so the only option that seems to cause errors is the method of finding centers and width...
+        ## TODO: Update the calculation of the centers and width according to studywolf methods..   
