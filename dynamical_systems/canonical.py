@@ -172,7 +172,7 @@ class SecondOrderDynamicalSystem():
     
 if __name__ == "__main__":
     
-    what_to_test = 0
+    what_to_test = 1
     """
     flag to test classes in this py file:
     if what_to_test is 0 test first order.
