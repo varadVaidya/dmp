@@ -139,10 +139,9 @@ if __name__ == '__main__':
         ## TODO: UPDATE: No erroes occurs but the position of the gauusians is still not oki for me.
         
         total_time = 10 # total time in seconds        
-        from canonical import FirstOrderDynamicalSystems
-        
+        #from canonical import FirstOrderDynamicalSystems
+        from dynamical_systems.canonical import FirstOrderDynamicalSystems
         X_decay = FirstOrderDynamicalSystems(alpha=1,x0 = 1)
-        
         x_values,timearray = X_decay.simulation(total_time)
         forcing_function = np.zeros_like(timearray)
         forcing_function[:] = 1

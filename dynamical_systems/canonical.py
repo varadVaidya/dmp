@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 
 class FirstOrderDynamicalSystems():
     
-    def __init__(self,alpha,beta = 1.0,timeconstant = 1.0,system = 0,dt = 0.001,x0 = 1,t0 =0, goal = 0):
+    def __init__(self,alpha,beta = 1.0,timeconstant = 1.0,system = 0,dt = 0.001,x0 = 1,t0 =0, goal = 0,totaltime = 10):
         """
         init the class and set its properties
 
@@ -24,6 +24,8 @@ class FirstOrderDynamicalSystems():
             x0 (float): inital state of the system. Defaults to 1. \n
             t0 (float): inital time \n
             goal (float): goal state of the system. Defaults to 0. \n
+            timearray (np array): time array for the simulation.
+    
         """
         ## set the parameters in the class
         self.alpha = alpha
@@ -34,6 +36,8 @@ class FirstOrderDynamicalSystems():
         self.system = system
         self.timeconstant = timeconstant
         self.beta = beta
+        self.timearray = np.linspace(self.t0,totaltime,int(totaltime/self.dt))
+        self.totaltime = totaltime
     
     def integrate(self,x,dt):
         """ this function will apply the euler step to the canonical system according to the type of the system
@@ -68,7 +72,8 @@ class FirstOrderDynamicalSystems():
         """
         ## plan is to simulate the system for the provided simulaiton time.
         
-        timearray = np.linspace(self.t0,totaltime,int(totaltime/self.dt)) ## setup the time array for which simulation will be done
+        timearray = self.timearray
+        # timearray = np.linspace(self.t0,totaltime,int(totaltime/self.dt)) ## setup the time array for which simulation will be done
         
         statearray = [] ## array to store the state variables
         currentstate = self.x0 ## define current state
