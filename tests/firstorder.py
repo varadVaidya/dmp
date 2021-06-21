@@ -1,14 +1,16 @@
 import sys,os
 
-path2add = os.path.normpath(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, 'dynamical_systems')))
-if (not (path2add in sys.path)) :
-    sys.path.append(path2add)
+# path2add = os.path.normpath(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, 'dynamical_systems')))
+# if (not (path2add in sys.path)) :
+#     sys.path.append(path2add)
 
+sys.path.append( sys.path[0] +'/..')
 print(sys.path)
 import numpy as np
 import matplotlib.pyplot as plt
 
-from canonical import FirstOrderDynamicalSystems
+from dynamical_systems.canonical import FirstOrderDynamicalSystems
+
 #from ..dynamical_systems.canonical import FirstOrderDynamicalSystems
 
 

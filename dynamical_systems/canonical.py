@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 
 class FirstOrderDynamicalSystems():
     
-    def __init__(self,alpha,beta = 1.0,timeconstant = 1.0,system = 0,dt = 0.001,x0 = 1,t0 =0, goal = 0):
+    def __init__(self,alpha,beta = 1.0,timeconstant = 1.0,system = 0,dt = 0.001,x0 = 1,t0 =0, goal = 0,totaltime=10):
         """
         init the class and set its properties
 
@@ -34,6 +34,8 @@ class FirstOrderDynamicalSystems():
         self.system = system
         self.timeconstant = timeconstant
         self.beta = beta
+        self.timearray = np.linspace(self.t0,totaltime,int(totaltime/self.dt))
+        self.totaltime = totaltime
     
     def integrate(self,x,dt):
         """ this function will apply the euler step to the canonical system according to the type of the system
@@ -72,7 +74,6 @@ class FirstOrderDynamicalSystems():
         
         statearray = [] ## array to store the state variables
         currentstate = self.x0 ## define current state
-        
         
         for i in range(len(timearray)): ## loop through time array
         

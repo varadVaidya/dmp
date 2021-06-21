@@ -121,7 +121,9 @@ def get_weights_from_forcing_functions(forcing_funcs,alpha_x,xvalues,noBasis,plo
     
         for i in range(noBasis):
             plt.plot(xvalues,values[:,i])        
+        plt.figure()
         plt.show()
+        
     
     if return_weights is True:
         return psi,weights
@@ -132,7 +134,7 @@ def get_weights_from_forcing_functions(forcing_funcs,alpha_x,xvalues,noBasis,plo
      
 if __name__ == '__main__':
     
-    what_to_test = 1  ## test the function get_weights_from_forcing_functions
+    what_to_test = 0  ## test the function get_weights_from_forcing_functions
     ## if what to test is 1 test the other code. 
     
     if what_to_test == 0:
@@ -146,8 +148,9 @@ if __name__ == '__main__':
         x_values,timearray = X_decay.simulation(total_time)
         forcing_function = np.zeros_like(timearray)
         forcing_function[:] = 1
-        psi,weights = get_weights_from_forcing_functions(forcing_function,X_decay.alpha,x_values,50,True,return_weights = True)     
-    
+        psi,weights = get_weights_from_forcing_functions(forcing_function,X_decay.alpha,x_values,10,True,return_weights = True)     
+
+        
         pass
     if what_to_test == 1:
         noBasis = 50
@@ -155,10 +158,11 @@ if __name__ == '__main__':
         values = noBasis * [None]
         weight_values = noBasis * [None]
         
+        total_time = 10 # total time in seconds
         
-        xvalues = np.linspace(0,noBasis,2000)
+        xvalues = np.linspace(0,total_time,int(total_time/0.01))
         
-        centers,widths,weights =  np.arange(0,noBasis),np.random.randint(1,3,size=(noBasis)) / 4 ,np.random.rand(noBasis)
+        centers,widths,weights =  np.linspace(0,total_time,noBasis),np.random.randint(1,3,size=(noBasis)) / 4 ,np.random.rand(noBasis)
         
         for i in range(noBasis):
             
@@ -211,6 +215,10 @@ if __name__ == '__main__':
         calc_psi = noBasis * [None]
         calc_values = noBasis * [None]
         calculated_weight_values = noBasis * [None]
+        
+        calc_centers = noBasis * [None]
+        calc_widths = noBasis * [None]
+        
         for i in range(noBasis):
             
             calc_psi[i] = Gaussian(widths[i],centers[i],calculated_weights[i])
