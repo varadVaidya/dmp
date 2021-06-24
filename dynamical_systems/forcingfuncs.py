@@ -134,7 +134,7 @@ def get_weights_from_forcing_functions(forcing_funcs,alpha_x,xvalues,noBasis,plo
      
 if __name__ == '__main__':
     
-    what_to_test = 0  ## test the function get_weights_from_forcing_functions
+    what_to_test = 1  ## test the function get_weights_from_forcing_functions
     ## if what to test is 1 test the other code. 
     
     if what_to_test == 0:
@@ -160,7 +160,7 @@ if __name__ == '__main__':
         
         total_time = 10 # total time in seconds
         
-        xvalues = np.linspace(0,total_time,int(total_time/0.01))
+        xvalues = np.linspace(0,total_time,int(total_time/0.001))
         
         centers,widths,weights =  np.linspace(0,total_time,noBasis),np.random.randint(1,3,size=(noBasis)) / 4 ,np.random.rand(noBasis)
         
@@ -202,34 +202,50 @@ if __name__ == '__main__':
         
         forcing_function = weight_gaussian
         
-        
-        PSI_matrix = np.empty(shape=(len(xvalues) , noBasis))
-        
-        for i in range(noBasis):
-            
-            PSI_matrix[:,i] = psi[i].evaluate(xvalues) * xvalues / np.sum(values,axis=1)
-        calculated_weights = np.linalg.pinv(PSI_matrix).dot(forcing_function)
-        print(calculated_weights)
-        print(weights)
+        ################################
+        # here we got our function. now we try to replicate it.
+        ################################
         
         calc_psi = noBasis * [None]
         calc_values = noBasis * [None]
         calculated_weight_values = noBasis * [None]
         
-        calc_centers = noBasis * [None]
+        calc_centers = np.linspace(0,total_time,noBasis)
         calc_widths = noBasis * [None]
+        
+        for i in range(noBasis-1):
+            calc_widths[i] = (calc_centers[i+1] - calc_centers[i]) * (calc_centers[i+1] - calc_centers[i]) 
+        
+        calc_widths[-1] = calc_widths[-2]
         
         for i in range(noBasis):
             
-            calc_psi[i] = Gaussian(widths[i],centers[i],calculated_weights[i])
+            calc_psi[i] = Gaussian(calc_widths[i],calc_centers[i])
             calc_values[i] = calc_psi[i].evaluate(xvalues)
+            
+        calc_values = np.array(calc_values).T
+            
+        PSI_matrix = np.empty(shape=(len(xvalues) , noBasis))
+        
+        for i in range(noBasis):
+            
+            PSI_matrix[:,i] = calc_psi[i].evaluate(xvalues) * xvalues / np.sum(calc_values,axis=1)
+            
+        calculated_weights = np.linalg.pinv(PSI_matrix).dot(forcing_function)
+        print(calculated_weights)
+        print(weights)
+        
+        for i in range(noBasis):
+            
+            calc_psi[i].weight = calculated_weights[i]
             calculated_weight_values[i] = calc_psi[i].weighted_evaluate(xvalues)
         
-        calc_values = np.array(calc_values).T
+        
+        
         calculated_weight_values = np.array(calculated_weight_values).T
         calc_weight_gaussian = np.sum(calculated_weight_values,axis=1)
         
-        plt.plot(xvalues,weight_gaussian ,'g|',label = 'calc_weight_gaussian')
+        plt.plot(xvalues,calc_weight_gaussian ,'g|',label = 'calc_weight_gaussian')
         plt.legend()
         plt.show()
         
