@@ -38,7 +38,7 @@ class functionApprox():
     def create_Gaussian_basis(numBasis,firstorderSystem,ifPlot=True):
         
         ## init the basis functions 
-        center = numBasis *[None]
+        #center = numBasis *[None]
         width = numBasis * [None]
         weight = numBasis * [None]
         
@@ -46,22 +46,26 @@ class functionApprox():
         
         des_activation = np.linspace(0,firstorderSystem.totaltime,numBasis)
         
-        ## calculate the centers
-        for i in range(numBasis):
-            #center[i] = np.exp(-firstorderSystem.alpha * des_activation[i])
-            center[i] = des_activation[i]
-            #center[i] = np.exp( -firstorderSystem.alpha*(i-1)/(numBasis-1))
-            #width[i] = numBasis**1.2 / center[i] / firstorderSystem.alpha
+        # ## calculate the centers
+        # for i in range(numBasis):
+        #     #center[i] = np.exp(-firstorderSystem.alpha * des_activation[i])
+        #     center[i] = des_activation[i]
+        #     #center[i] = np.exp( -firstorderSystem.alpha*(i-1)/(numBasis-1))
+        #     #width[i] = numBasis**1.2 / center[i] / firstorderSystem.alpha
         
+        center = np.linspace(0,firstorderSystem.totaltime,numBasis)
         ## calculate width
         # for j in range(numBasis-1):
         #     width[j] = 1/(center[j+1] - center[j]) **1.4
         # 
         # width[-1] = width[-2]
+        for i in range(numBasis-1):
+            width[i] = (center[i+1] - center[i])**1.4
+        width[-1] = width[-2]
         
-        for i in range(numBasis):
-            width[i] = numBasis**.5/center[i]/ firstorderSystem.alpha
-        width[0] = width[1]               
+        # for i in range(numBasis):
+        #   width[i] = numBasis**.5/center[i]/ firstorderSystem.alpha
+        #width[0] = width[1]               
         # print("centers",center)
         # print("width",width)
         
@@ -122,12 +126,15 @@ if __name__ == '__main__':
     phaseSystem = FirstOrderDynamicalSystems(alpha = 1,totaltime= 10)
     
     numBasis = 50
+    forcingfunc = functionApprox.generateRandomForcingFunc(numBasis,phaseSystem)
+    
     PSI,gaussian_values = functionApprox.create_Gaussian_basis(numBasis,phaseSystem,ifPlot = True)
     
     # forcingfunc = np.zeros_like(phaseSystem.timearray)
     # forcingfunc = np.sin(phaseSystem.timearray)
     
-    forcingfunc = functionApprox.generateRandomForcingFunc(numBasis,phaseSystem)
+    if len(forcingfunc) != len(phaseSystem.timearray):
+        raise ValueError("forcing func size invalid")
     print("stagw 1")
     weights = functionApprox.get_weights(forcingfunc,PSI,gaussian_values,phaseSystem,numBasis)
     print("stage 2")
@@ -142,8 +149,8 @@ if __name__ == '__main__':
     
     import matplotlib.pyplot as plt
     plt.plot(phaseSystem.timearray,forcingfunc,label = "forcing func")
-    plt.plot(phaseSystem.timearray,approximatedFunc,label="approximatedFunc")
-    plt.title('Approximate Functions')
+    #plt.plot(phaseSystem.timearray,approximatedFunc,label="approximatedFunc")
+    #plt.title('Approximate Functions')
     plt.legend()
     plt.show()
     #plotGaussians('Function Approximate',weighted_evaluate,numBasis,phaseSystem.timearray)
