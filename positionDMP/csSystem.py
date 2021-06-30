@@ -7,6 +7,7 @@ class CanonicalSystem():
     def __init__(self,alpha,t,tau):
         self.alpha = alpha
         self.dt = np.gradient(t)[0]
+        self.t = t
         self.tau = tau
         self.reset()
     
@@ -19,8 +20,8 @@ class CanonicalSystem():
         '''
         solve the canonical system
         '''
-        rolloutArray = np.empty_like(t)
-        for i in range(len(t)):
+        rolloutArray = np.empty_like(self.t)
+        for i in range(len(self.t)):
             rolloutArray[i] = self.x
             self.step()   
         
