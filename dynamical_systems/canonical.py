@@ -59,7 +59,7 @@ class FirstOrderDynamicalSystems():
         
         return xnext
     
-    def simulation(self,totaltime = 10):
+    def simulation(self):
         """plan is to simulate the system for the provided simulaiton time.
         Args:
             totaltime (float): total time of simulation to be executed. Defaults to 10.
@@ -69,7 +69,7 @@ class FirstOrderDynamicalSystems():
             timearray (numpy array): numpy array of the time state. 
         """
         ## plan is to simulate the system for the provided simulaiton time.
-        
+        totaltime = self.totaltime
         timearray = np.linspace(self.t0,totaltime,int(totaltime/self.dt)) ## setup the time array for which simulation will be done
         
         statearray = [] ## array to store the state variables
@@ -83,13 +83,13 @@ class FirstOrderDynamicalSystems():
         
         statearray = np.array(statearray) ## convert to numpy array for plotting
         
-        return statearray,timearray
+        return statearray
 
 
 
 class SecondOrderDynamicalSystem():
     
-    def __init__(self,alpha,beta = None ,timeconstant = 1.0,dt = 0.001,x0 = np.array([0,1]),t0 =0, goal = 0):
+    def __init__(self,alpha,beta = None ,timeconstant = 1.0,dt = 0.001,x0 = np.array([0,1]),t0 =0, goal = 0,totaltime =10):
         """init the SecondOrderDynamicalSystem class \n
 
         Args: \n 
@@ -113,6 +113,9 @@ class SecondOrderDynamicalSystem():
         self.x0 = x0
         self.t0 = t0
         self.goal = goal
+        self.totaltime = totaltime
+        self.timearray = np.linspace(self.t0,self.totaltime,int(self.totaltime/self.dt))
+        
         
     def integrate(self,x,dt):
         """ performs eu
