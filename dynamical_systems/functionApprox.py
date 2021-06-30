@@ -38,47 +38,48 @@ class functionApprox():
     def create_Gaussian_basis(numBasis,firstorderSystem,ifPlot=True):
         
         ## init the basis functions 
-        #center = numBasis *[None]
-        width = numBasis * [None]
-        weight = numBasis * [None]
+        center,width = np.empty(numBasis),np.empty(numBasis)
         
         PSI = numBasis * [None]
         
         des_activation = np.linspace(0,firstorderSystem.totaltime,numBasis)
         
         # ## calculate the centers
-        # for i in range(numBasis):
-        #     #center[i] = np.exp(-firstorderSystem.alpha * des_activation[i])
-        #     center[i] = des_activation[i]
-        #     #center[i] = np.exp( -firstorderSystem.alpha*(i-1)/(numBasis-1))
-        #     #width[i] = numBasis**1.2 / center[i] / firstorderSystem.alpha
         
-        center = np.linspace(0,firstorderSystem.totaltime,numBasis)
+        center = np.exp(-firstorderSystem.alpha * np.linspace(0,1,numBasis) * firstorderSystem.totaltime)
+        width = 1/np.gradient(center)**2
+        
+        # for i in range(numBasis):
+        #     center[i] = np.exp(-firstorderSystem.alpha * des_activation[i])
+        #     #center[i] = des_activation[i]
+        #     #center[i] = np.exp( -firstorderSystem.alpha*des_activation[i]*(i)/(numBasis))
+        #     #width[i] = numBasis / center[i] / firstorderSystem.alpha ## this width is final
+        #center = np.linspace(0,firstorderSystem.totaltime,numBasis)
         ## calculate width
         # for j in range(numBasis-1):
-        #     width[j] = 1/(center[j+1] - center[j]) **1.4
-        # 
+        #     width[j] = 1/ ( (center[j+1] - center[j]) * ((center[j+1] - center[j])) ) 
+        
         # width[-1] = width[-2]
-        for i in range(numBasis-1):
-            width[i] = (center[i+1] - center[i])**1.4
-        width[-1] = width[-2]
+        
         
         # for i in range(numBasis):
-        #   width[i] = numBasis**.5/center[i]/ firstorderSystem.alpha
-        #width[0] = width[1]               
-        # print("centers",center)
-        # print("width",width)
+        #     width[i] = numBasis/center[i]**1.5/ firstorderSystem.alpha
+        # width[0] = width[1]               
+        print("centers",center)
+        print("width",width)
         
         ## fill the gaussina class        
         gaussian_values = numBasis * [None]
+        xvalues = firstorderSystem.simulation()
         for i in range(numBasis):
             
             PSI[i] = Gaussian(width[i], center[i])
-            gaussian_values[i] = PSI[i].evaluate(firstorderSystem.timearray)
+            gaussian_values[i] = PSI[i].evaluate(xvalues)
         
         gaussian_values = np.array(gaussian_values).T
         if ifPlot:
-            plotGaussians('Gaussians',gaussian_values,numBasis,firstorderSystem.timearray)
+            plotGaussians('Gaussians',gaussian_values,numBasis,xvalues)
+            plotGaussians('Time Series Gaussian',gaussian_values,numBasis,firstorderSystem.timearray)
         
         return PSI,gaussian_values
         
@@ -109,39 +110,115 @@ class functionApprox():
         if len(forcing_function) != len(firstorderSystem.timearray):
             raise ValueError("forcing function must have the same dimensions as the time array.")
         
-        PSI_matrix = np.empty(shape=(len(firstorderSystem.timearray) , numBasis))
+        xvalues = firstorderSystem.simulation()
+        PSI_matrix = np.empty(shape=(len(xvalues) , numBasis))
             
         for i in range(numBasis):
-            PSI_matrix[:,i] = PSI[i].evaluate(firstorderSystem.timearray) * firstorderSystem.timearray / np.sum(gaussian_values,axis=1)
+            PSI_matrix[:,i] = PSI[i].evaluate(xvalues) *xvalues / np.sum(gaussian_values,axis=1)
+        
+        # for xval in range((len(xvalues))):
+            
+        #     denomSum = 0
+            
+        #     for N in range(numBasis):
+        #         PSI_matrix[xval,N] = PSI[N].evaluate(xvalues[xval]) * xvalues[xval]
+        #         denomSum = denomSum + PSI[N].evaluate(xvalues[xval])
+            
+        #     PSI_matrix[xval] = PSI_matrix[xval]/ denomSum
+                
+                
         
         weights = np.linalg.pinv(PSI_matrix).dot(forcing_function)
         
+        #weights = np.dot(PSI_matrix.T, forcing_function)
+        
         #print(weights)
         return weights   
+    
+    def get_weights_lstsquare(forcing_function,PSI,gaussian_values,firstorderSystem,numBasis):
+        xvalues = firstorderSystem.simulation()
+        PSI_matrix = np.empty(shape=(len(xvalues) , numBasis))
+            
+        # for i in range(numBasis):
+        #     PSI_matrix[:,i] = PSI[i].evaluate(xvalues) *xvalues / np.sum(gaussian_values,axis=1)
+        
+        # for xval in range((len(xvalues))):
+            
+        #     denomSum = 0
+            
+        #     for N in range(numBasis):
+        #         PSI_matrix[xval,N] = PSI[N].evaluate(xvalues[xval]) * xvalues[xval]
+        #         denomSum = denomSum + PSI[N].evaluate(xvalues[xval])
+            
+        #     PSI_matrix[xval] = PSI_matrix[xval]/ denomSum
+        
+            
+        weights = np.linalg.lstsq(PSI_matrix,forcing_function,rcond=None)[0]
+        
+        return weights
+        
+    def generateFrontTerm(firstorderSystem,secondorderSystem):
+        xvalues = firstorderSystem.simulation()
+        spatialScale = secondorderSystem.goal - secondorderSystem.x0[1]
+        print(spatialScale)
+        frontTerm = xvalues * spatialScale
+        
+        return frontTerm
+        
+    def get_weightsLWR(PSI,forcingFunc,numBasis,firstorderSystem,secondorderSystem):
+        
+        frontTerm = functionApprox.generateFrontTerm(firstorderSystem,secondorderSystem)
+        weights = numBasis * [None]
+        for i in range(numBasis):
+            
+            diagEntry = PSI[i].evaluate(firstorderSystem.simulation())
+            # num = np.linalg.multi_dot((
+            #     frontTerm.T, np.diag(diagEntry) , forcingFunc 
+            # ))
+            # den = np.linalg.multi_dot((
+            #     frontTerm **2 , diagEntry
+            # ))
+            
+            num = np.sum(frontTerm * np.diag(diagEntry), forcingFunc)
+            den = np.sum(frontTerm **2 * np.diag(diagEntry))
+            
+            weights[i] = num/den
+        
+        return weights
         
 if __name__ == '__main__':
     
     from dynamical_systems.canonical import FirstOrderDynamicalSystems
-    # from dynamical_systems.canonical import FirstOrderDynamicalSystems
-    phaseSystem = FirstOrderDynamicalSystems(alpha = 1,totaltime= 10)
+    from dynamical_systems.canonical import SecondOrderDynamicalSystem
     
-    numBasis = 50
+    totaltime = 5
+    phaseSystem = FirstOrderDynamicalSystems(alpha = 1,totaltime= totaltime)
+    dynamicalSystem = SecondOrderDynamicalSystem(alpha =1,goal = 2,totaltime= totaltime)
+    xvalues = phaseSystem.simulation()
+    print("xvalues \n",xvalues)
+    numBasis = 10
     forcingfunc = functionApprox.generateRandomForcingFunc(numBasis,phaseSystem)
+    # forcingfunc[0:1000] ,forcingfunc[-1000:-1] = 0,0
+    # forcingfunc[-1] = 0
+    if len(phaseSystem.simulation()) != len(forcingfunc):
+        print("fucked")
     
     PSI,gaussian_values = functionApprox.create_Gaussian_basis(numBasis,phaseSystem,ifPlot = True)
     
-    # forcingfunc = np.zeros_like(phaseSystem.timearray)
-    # forcingfunc = np.sin(phaseSystem.timearray)
     
     if len(forcingfunc) != len(phaseSystem.timearray):
         raise ValueError("forcing func size invalid")
     print("stagw 1")
-    weights = functionApprox.get_weights(forcingfunc,PSI,gaussian_values,phaseSystem,numBasis)
+    #weights = functionApprox.get_weights(forcingfunc,PSI,gaussian_values,phaseSystem,numBasis)
+    #weights = functionApprox.get_weightsLWR(PSI,forcingfunc,numBasis,phaseSystem,dynamicalSystem)\
+    weights = functionApprox.get_weights_lstsquare(forcingfunc,PSI,gaussian_values,phaseSystem,numBasis)
+    print("weights shape",weights.shape)
+    print("weights",weights)
     print("stage 2")
     weighted_evaluate = [None] * numBasis
     for i in range(numBasis):
         PSI[i].weight = weights[i]
-        weighted_evaluate[i] = PSI[i].weighted_evaluate(phaseSystem.timearray)
+        weighted_evaluate[i] = PSI[i].weighted_evaluate(xvalues)
     
     print("satgw 2")
     weighted_evaluate = np.array(weighted_evaluate).T
@@ -149,11 +226,11 @@ if __name__ == '__main__':
     
     import matplotlib.pyplot as plt
     plt.plot(phaseSystem.timearray,forcingfunc,label = "forcing func")
-    #plt.plot(phaseSystem.timearray,approximatedFunc,label="approximatedFunc")
-    #plt.title('Approximate Functions')
+    plt.plot(phaseSystem.timearray,approximatedFunc,label="approximatedFunc")
+    plt.title('Approximate Functions')
     plt.legend()
     plt.show()
-    #plotGaussians('Function Approximate',weighted_evaluate,numBasis,phaseSystem.timearray)
+    plotGaussians('Function Approximate',weighted_evaluate,numBasis,phaseSystem.timearray)
     
             
         
