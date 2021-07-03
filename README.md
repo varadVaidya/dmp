@@ -1,2 +1,2 @@
 # DMP
-## currently "dynamical_systems" and "tests" are archived. 
+## currently "dynamical_systems" is archived. 
