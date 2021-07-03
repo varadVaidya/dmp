@@ -1,5 +1,5 @@
 {
-    "python.pythonPath": "/usr/bin/python3",
+    "python.pythonPath": "C:\\Users\\vaidy\\AppData\\Local\\Programs\\Python\\Python38\\python.exe",
     "python.linting.pylintArgs": ["--init-hook",
         "import sys; sys.path.append('/home/varad/Study/Robotics/dmp')"
     ],
