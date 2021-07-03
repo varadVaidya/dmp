@@ -51,7 +51,6 @@ class FirstOrderDynamicalSystems():
         ## decide the velocity profile of the system according to the value set in self.system.
         if self.system == 0:
             dx = -self.alpha * (x - self.goal) * 1/self.timeconstant  ## based on the system rule. set to exponential decay.
-        
         if self.system == 1:
             dx = self.alpha * x *(self.beta - (x - self.goal))
         xnext = x + dx * dt ## euler step for getting cuuent state
@@ -176,7 +175,7 @@ class SecondOrderDynamicalSystem():
     
 if __name__ == "__main__":
     
-    what_to_test = 1
+    what_to_test = 0
     """
     flag to test classes in this py file:
     if what_to_test is 0 test first order.
