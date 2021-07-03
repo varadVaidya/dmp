@@ -165,7 +165,7 @@ class PositionDMP():
         self.p += self.dp * self.dt
         return self.p, self.dp, self.ddp ## ~ returned to plot stuff later on
         
-    def rollout(self):
+    def rollout(self,position):
         
         self.reset()
         
@@ -199,9 +199,10 @@ class PositionDMP():
         
 if __name__ =="__main__":
     
+    ## doesnt work anymore. refer examples/cartesianDMP.py
     import matplotlib.pyplot as plt
     
-    dmp = PositionDMP(N_bfs=200,alpha= 10,cs_alpha=1,totaltime = 5)
+    dmp = PositionDMP(N_bfs=200,alpha= 10,cs_alpha=2,totaltime = 5)
     #position = np.array([np.polyval([1,-2,3,4],dmp.t),np.polyval([-1,2,-3,4],dmp.t),np.polyval([-1,2,-3,4],dmp.t)]).T
     position = np.array([np.sin(dmp.t),np.sin(dmp.t),np.sin(dmp.t)]).T
 
