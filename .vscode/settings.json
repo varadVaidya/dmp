@@ -8,4 +8,12 @@
     "python.linting.banditEnabled": false,
     "python.linting.mypyEnabled": false,
     "python.linting.pylintEnabled": true,
+    "spellright.language": [
+        "en"
+    ],
+    "spellright.documentTypes": [
+        "markdown",
+        "latex",
+        "plaintext"
+    ],
 }
