@@ -2,3 +2,4 @@ dynamical_systems/__pycache__/canonical.cpython-38.pyc
 .vscode/settings.json
 dynamical_systems/__pycache__/__init__.cpython-38.pyc
 positionDMP/testQuat.py
+test_grad.py
