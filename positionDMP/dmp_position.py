@@ -19,7 +19,7 @@ class Gaussian():
     
 class PositionDMP():
     
-    def __init__(self,alpha,cs_alpha,N_bfs = 10,totaltime = 10,cs_tau = 1):
+    def __init__(self,alpha,cs_alpha,N_bfs = 10,totaltime = 10,cs_tau = 1,n_dim = 3):
         
         self.N_bfs = N_bfs
         self.alpha = alpha
@@ -28,9 +28,9 @@ class PositionDMP():
         self.cs_alpha = cs_alpha
         self.t = np.linspace(0,totaltime,int(totaltime/0.01) + 1)
         self.dt = self.t[1] - self.t[0]
-        
+        self.n_dim = n_dim
         # scaling factor.
-        self.Dp = np.identity(3)
+        self.Dp = np.identity(self.n_dim)
         
         self.cs = CanonicalSystem(alpha = self.cs_alpha,t=self.t,tau= cs_tau)
         
@@ -41,17 +41,17 @@ class PositionDMP():
         # variance of the basis functions
         self.h = 1.0/np.gradient(self.c)**2
         
-        self.w = np.zeros((3,N_bfs))
+        self.w = np.zeros((self.n_dim,N_bfs))
         
-        self.initPos = np.zeros(3)
-        self.goalPos = np.zeros(3)
+        self.initPos = np.zeros(self.n_dim)
+        self.goalPos = np.zeros(self.n_dim)
         
         self.reset()
     
     def reset(self):
         self.p = self.initPos.copy()
-        self.dp = np.zeros(3)
-        self.ddp = np.zeros(3)
+        self.dp = np.zeros(self.n_dim)
+        self.ddp = np.zeros(self.n_dim)
         self.cs.reset()
         
     ## placeholder function to generate Random Forcing Func
