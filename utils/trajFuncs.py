@@ -1,6 +1,7 @@
 import numpy as np
 
 def generate3DTraj(initPos,initVel,finalPos,T,t):
+    ## generates minimum jerk trajectory
     ## T = totaltime pf the trajectory
     ## timearray to evaluate the trajectory
     finalVel = np.zeros(3)
@@ -22,7 +23,8 @@ def generate3DTraj(initPos,initVel,finalPos,T,t):
     yTraj = np.polyval(yTrajCoeff,t)
     zTraj = np.polyval(zTrajCoeff,t)
     
-    return xTraj,yTraj,zTraj
+    posTraj = np.vstack((xTraj,yTraj,zTraj)).T
+    return posTraj
 
 if __name__ == '__main__':
     
@@ -36,7 +38,7 @@ if __name__ == '__main__':
             [2,3,0],
         ])
         t = np.linspace(0,5,101)
-        x,y,z = generate3DTraj(initPos,initVel,finalPos,T = 5,t = t)
+        x,y,z = generate3DTraj(initPos,initVel,finalPos,T = 5,t = t).T
         
         import matplotlib.pyplot as plt
         plt.plot(t,x)
