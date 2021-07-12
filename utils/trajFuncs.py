@@ -22,13 +22,38 @@ def generate3DTraj(initPos,initVel,finalPos,T,t):
     xTraj = np.polyval(xTrajCoeff,t)
     yTraj = np.polyval(yTrajCoeff,t)
     zTraj = np.polyval(zTrajCoeff,t)
-    
+    #print(xTrajCoeff)
     posTraj = np.vstack((xTraj,yTraj,zTraj)).T
+    return posTraj
+
+def generate2DTraj(initPos,initVel,finalPos,T,t):
+    ## generates minimum jerk trajectory
+    ## T = totaltime pf the trajectory
+    ## timearray to evaluate the trajectory
+    finalVel = np.zeros(2)
+    
+    boundaryCondition = np.vstack((
+        initPos,initVel,finalPos,finalVel
+    ))
+    
+    coeffMatrix = np.array([
+        [0,0,0,1],
+        [0,0,1,0],
+        [T**3,T**2,T,1],
+        [3*T**2,2*T,1,0]
+    ])
+    
+    xTrajCoeff,yTrajCoeff = np.linalg.solve(coeffMatrix,boundaryCondition).T
+    
+    xTraj = np.polyval(xTrajCoeff,t)
+    yTraj = np.polyval(yTrajCoeff,t)
+    #print(xTrajCoeff)
+    posTraj = np.vstack((xTraj,yTraj)).T
     return posTraj
 
 if __name__ == '__main__':
     
-    what_to_test = 0
+    what_to_test = 1
     
     if what_to_test == 0:
         
@@ -39,6 +64,19 @@ if __name__ == '__main__':
         ])
         t = np.linspace(0,5,101)
         x,y,z = generate3DTraj(initPos,initVel,finalPos,T = 5,t = t).T
+        
+        import matplotlib.pyplot as plt
+        plt.plot(t,x)
+        plt.show()
+    
+    if what_to_test == 1:
+        initPos,initVel,finalPos = np.array([
+            [0,0],
+            [0,0],
+            [2,3]
+        ])
+        t = np.linspace(0,5,101)
+        x,y = generate2DTraj(initPos,initVel,finalPos,T = 5,t = t).T
         
         import matplotlib.pyplot as plt
         plt.plot(t,x)
