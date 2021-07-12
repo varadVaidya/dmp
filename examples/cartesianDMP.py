@@ -5,7 +5,7 @@ sys.path.append( sys.path[0] +'/..')
 from positionDMP.dmp_position import PositionDMP
 from utils.trajFuncs import generate3DTraj
 
-dmp = PositionDMP(N_bfs=100,alpha= 30,cs_alpha=5,totaltime = 5) ## ^ init the DMP class.
+dmp = PositionDMP(N_bfs=100,alpha= 30,cs_alpha=3,totaltime = 5,cs_tau = 1) ## ^ init the DMP class.
 
 initPos,initVel,finalPos = np.array([
     [0,-1,0],
