@@ -20,8 +20,8 @@ class Obstacle():
         #self.currentVel = self.initVel.copy() ## current velocity of the obstacle
         ## parameters for the dynamic potential field.
         self.speed = np.zeros(self.n_dim) ## speed of the obstacle.
-        self.lambda_ = 6
-        self.beta = 2
+        self.lambda_ = 3
+        self.beta = 3
     
     def get_distance(self,X):
         ## distance between obstacle and position of the end effector
@@ -62,10 +62,17 @@ class Obstacle():
 
     def obstacle_force(self,V,X):
         
-    
-        if self.get_cosine_angle(V,X) <= 0:
+        mod_V = np.linalg.norm(V)
+        
+        if mod_V == 0:
+            return 0
+
+        angle = np.arccos(self.get_cosine_angle(V,X))
+        
+        apply_force = angle > np.pi/2 and angle <= np.pi
+        
+        if apply_force:
             # define the variables    
-            mod_V = np.linalg.norm(V)
             p = self.get_distance(X)
             cos_theta = self.get_cosine_angle(V,X)
             grad_P = self.grad_P(X)
