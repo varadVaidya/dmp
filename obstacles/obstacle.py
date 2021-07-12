@@ -5,20 +5,22 @@ class Obstacle():
     ## will contain all the obstacle info necessary:
     ## also has the paramerters to define the dynamic potential field
     ## obstacle can also move with time
-    def __init__(self,initPos = None ,initVel = None):
+    def __init__(self,n_dim = 3,initPos = None ,initVel = None):
+        
+        self.n_dim = n_dim ## dimension in which the obstacle exists
         
         if initPos is None:
-            self.initPos = np.zeros(3) ## the initial position of the obstacle
-            self.initVel = np.zeros(3) ## initial velocity of of the obstacle
+            self.initPos = np.zeros(self.n_dim) ## the initial position of the obstacle
+            #self.initVel = np.zeros(3) ## initial velocity of of the obstacle
         else:
             self.initPos = initPos
-            self.initVel = initVel
+            #self.initVel = initVel
         
         self.currentPos = self.initPos.copy() ## current position of the obstacle
-        self.currentVel = self.initVel.copy() ## current velocity of the obstacle
+        #self.currentVel = self.initVel.copy() ## current velocity of the obstacle
         ## parameters for the dynamic potential field.
-        self.speed = np.zeros(3) ## speed of the obstacle.
-        self.lambda_ = 1.0
+        self.speed = np.zeros(self.n_dim) ## speed of the obstacle.
+        self.lambda_ = 6
         self.beta = 2
     
     def get_distance(self,X):
@@ -78,16 +80,16 @@ class Obstacle():
             return phi_x_v
         
         else:
-            return np.zeros(3)
+            return np.zeros(self.n_dim)
         
     def step(self,dt):
         self.currentPos += self.speed * dt
 if __name__ == "__main__":
     
     #import numpy as np
-    o1 = Obstacle()
-    v = np.array([1,1,0]) ## velocity of the end effector
-    x = np.array([-1,-1,0]) ## position of the end effector
+    o1 = Obstacle(n_dim=2) ## 0,0
+    v = np.array([1,1]) ## velocity of the end effector
+    x = np.array([-1,-1]) ## position of the end effector
     
     obstacle_force = o1.obstacle_force(v,x)
     print(obstacle_force)      
