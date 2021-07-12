@@ -19,7 +19,7 @@ class Gaussian():
     
 class PositionDMP():
     
-    def __init__(self,alpha,cs_alpha,N_bfs = 10,totaltime = 10,cs_tau = 1,n_dim = 3):
+    def __init__(self,alpha,cs_alpha,N_bfs = 10,totaltime = 10,cs_tau = 1,n_dim = 3,obstacle = None):
         
         self.N_bfs = N_bfs
         self.alpha = alpha
@@ -46,6 +46,7 @@ class PositionDMP():
         self.initPos = np.zeros(self.n_dim)
         self.goalPos = np.zeros(self.n_dim)
         
+        self.obstacle = obstacle
         self.reset()
     
     def reset(self):
@@ -157,9 +158,13 @@ class PositionDMP():
             f_ = self.Dp.dot(xi * self.w.dot(psi)/psi.sum() )
             return  f_
 
+        if self.obstacle is None:
+            self.ddp = (self.alpha * (self.beta * (self.goalPos - self.p) - self.cs.tau* self.dp ) + forcing_(x) ) * 1/self.cs.tau
         
-        self.ddp = (self.alpha * (self.beta * (self.goalPos - self.p) - self.cs.tau* self.dp ) + forcing_(x) ) * 1/self.cs.tau
-        
+        if self.obstacle is not None and self.n_dim == self.obstacle.n_dim:
+            self.ddp = (self.alpha * (self.beta * (self.goalPos - self.p) - self.cs.tau* self.dp ) 
+                        + forcing_(x) + self.obstacle.obstacle_force(self.dp,(self.p - self.obstacle.initPos)) ) * 1/self.cs.tau
+            
         self.dp += self.ddp * self.dt
         
         self.p += self.dp * self.dt
