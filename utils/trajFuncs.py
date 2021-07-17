@@ -62,11 +62,11 @@ def convertTo_pybulletQuat(quaternion):
     
     ## quaternion is of the class quaternionic
     
-    pbQuaternion = np.zeros_like(quaternion.ndarray)
-    pbQuaternion[:,0:3] = quaternion.vector
-    pbQuaternion[:,3] = quaternion.real
+    pbQuaternion = np.zeros_like(quaternion.ndarray).T
+    pbQuaternion[0:3] = quaternion.vector.T
+    pbQuaternion[3] = quaternion.real
     
-    return pbQuaternion
+    return pbQuaternion.T
 
 def convertFrom_pybulletQuat(pbQuaternion):
     
