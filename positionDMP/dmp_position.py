@@ -2,7 +2,7 @@ import sys
 sys.path.append( sys.path[0] +'/..')
 import numpy as np
 from positionDMP.csSystem import CanonicalSystem 
-
+import matplotlib.pyplot as plt
 ## placeholder class for testing. used from previous version.
 class Gaussian():
     
@@ -126,14 +126,15 @@ class PositionDMP():
                            
         # scaling factor         
         self.Dp = np.diag(self.goalPos - self.initPos)
-        Dp_inv = np.linalg.inv(self.Dp)
+        #Dp_inv = np.linalg.inv(self.Dp)
         
         des_dp = np.gradient(position,axis=0)/self.dt
         des_ddp = np.gradient(des_dp,axis=0)/self.dt
         
         def forcing(i):
             f_i = self.cs.tau**2 * des_ddp[i] - self.alpha * ( self.beta * (self.goalPos - position[i])  - self.cs.tau*des_dp[i] )
-            scaled_f_i =  Dp_inv.dot(f_i) 
+            #scaled_f_i =  Dp_inv.dot(f_i) 
+            scaled_f_i = f_i
             return scaled_f_i
         
         A = np.stack(feature_(xj) for xj in self.x)
@@ -155,7 +156,8 @@ class PositionDMP():
             
             psi = np.exp(-self.h* (xi - self.c) **2)
             
-            f_ = self.Dp.dot(xi * self.w.dot(psi)/psi.sum() )
+            #f_ = self.Dp.dot(xi * self.w.dot(psi)/psi.sum() )
+            f_ = (xi * self.w.dot(psi)/psi.sum() )
             return  f_
 
         if self.obstacle is None:
@@ -207,7 +209,7 @@ if __name__ =="__main__":
     ## doesnt work anymore. refer examples/cartesianDMP.py
     import matplotlib.pyplot as plt
     
-    dmp = PositionDMP(N_bfs=200,alpha= 10,cs_alpha=2,totaltime = 5)
+    dmp = PositionDMP(N_bfs=20,alpha= 10,cs_alpha=2,totaltime = 5)
     #position = np.array([np.polyval([1,-2,3,4],dmp.t),np.polyval([-1,2,-3,4],dmp.t),np.polyval([-1,2,-3,4],dmp.t)]).T
     position = np.array([np.sin(dmp.t),np.sin(dmp.t),np.sin(dmp.t)]).T
 
@@ -215,7 +217,7 @@ if __name__ =="__main__":
     dmp.train(position)
     # np.savetxt("dmp accel.csv",dmp.trained_des_ddp,fmt="%f",delimiter=",")
     # np.savetxt("dmp velocity.csv",dmp.trained_des_dp,fmt="%f",delimiter=",")
-    dmp_position = dmp.rollout()
+    dmp_position = dmp.rollout(position)
     # np.savetxt("dmp_position.csv",dmp_position,fmt="%f",delimiter=",")
     ## plotting the euclidiean difference between dmp position and the given position
     
