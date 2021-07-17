@@ -67,6 +67,18 @@ def convertTo_pybulletQuat(quaternion):
     pbQuaternion[:,3] = quaternion.real
     
     return pbQuaternion
+
+def convertFrom_pybulletQuat(pbQuaternion):
+    
+    ## pbQuaternion is a list coming from pybullet
+    
+    quaternion = np.zeros_like(pbQuaternion)
+    
+    quaternion[0] = pbQuaternion[-1]
+    quaternion[1:4] = pbQuaternion[0:3]
+    
+    return quaternion
+    
     
     
 
