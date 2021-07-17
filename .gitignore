@@ -3,3 +3,9 @@ dynamical_systems/__pycache__/canonical.cpython-38.pyc
 dynamical_systems/__pycache__/__init__.cpython-38.pyc
 positionDMP/testQuat.py
 test_grad.py
+utils/manipulation/kinematics.py
+utils/manipulation/__pycache__/kinematics.cpython-38.pyc
+utils/manipulation/__pycache__/manipulator.cpython-38.pyc
+positionDMP/__pycache__/dmp_quat.cpython-38.pyc
+positionDMP/__pycache__/dmp_position.cpython-38.pyc
+obstacles/__pycache__/obstacle.cpython-38.pyc
