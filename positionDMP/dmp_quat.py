@@ -84,8 +84,9 @@ class QuaternionDMP():
         # self.initQuat = rotation[-1]
         
         rotationError = 2 * np.log(self.goalQuat * self.initQuat.conjugate() )
+        #rotationError = self.goalQuat * self.initQuat.conjugate() 
         self.Do = np.diag(rotationError.vector)
-        print(self.Do,"scaling matrix")
+
         DO_inv = np.linalg.inv(self.Do)
         
         des_dq = []
@@ -100,6 +101,7 @@ class QuaternionDMP():
         des_ddq = qt.array(np.gradient(des_dq,axis=0)/self.dt)
         
         self.x = self.cs.rollout()
+        
         def forcing(i):
             betaTerm = 2 * np.log(self.goalQuat * rotation[i].conjugate())
             f_i = self.cs.tau**2 * des_ddq[i].vector - self.alpha * ( self.beta * betaTerm.vector  - self.cs.tau*des_dq[i].vector )
