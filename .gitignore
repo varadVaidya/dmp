@@ -9,3 +9,7 @@ utils/manipulation/__pycache__/manipulator.cpython-38.pyc
 positionDMP/__pycache__/dmp_quat.cpython-38.pyc
 positionDMP/__pycache__/dmp_position.cpython-38.pyc
 obstacles/__pycache__/obstacle.cpython-38.pyc
+__pycache__
+positionDMP/__pycache__
+utils/__pycache__
+utils\manipulation\__pycache__
