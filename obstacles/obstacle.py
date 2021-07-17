@@ -21,7 +21,7 @@ class Obstacle():
         ## parameters for the dynamic potential field.
         self.speed = np.zeros(self.n_dim) ## speed of the obstacle.
         self.lambda_ = 3
-        self.beta = 3
+        self.beta = 2
     
     def get_distance(self,X):
         ## distance between obstacle and position of the end effector

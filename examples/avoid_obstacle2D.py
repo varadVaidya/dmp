@@ -11,9 +11,9 @@ o1 = Obstacle(initPos=np.array([0,0]),n_dim=2)
 dmp = PositionDMP(N_bfs=100,alpha= 30,cs_alpha=3,totaltime = 5,cs_tau = 1,n_dim = 2,obstacle = o1) ## ^ init the DMP class.
 
 initPos,initVel,finalPos = np.array([
-    [0,-1],
-    [0,1],
-    [2,3],
+    [-1,-1],
+    [0,0],
+    [1.3,1.1],
 ])
 
 position = generate2DTraj(initPos,initVel,finalPos,dmp.totaltime,dmp.t)
@@ -44,5 +44,6 @@ ax[2].legend()
 fig2,ax2 = plt.subplots(1,1)
 ax2.plot(position[:,0],position[:,1],label='demo')
 ax2.plot(dmp_position[:,0],dmp_position[:,1],label='dmp')
-ax2.plot(o1.initPos[0],o1.initPos[1],'ro')
+ax2.plot(o1.initPos[0],o1.initPos[1],'ro',label='obstacle')
+ax2.legend()
 plt.show()
