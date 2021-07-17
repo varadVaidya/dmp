@@ -21,15 +21,16 @@ quatDMP = QuaternionDMP(alpha = 40, cs_alpha = 1,N_bfs=100,totaltime = totaltime
 
 ## generate position and orientation trajectory
 initPos,initVel,finalPos = np.array([
-    [0.2,0.2,0.5],
+    [0,0,1],
     [0,0,0],
-    [-0.3,0,0.8],
+    [0.1,0.2,0.8],
 ])
 quatDMP.initQuat = qt.array([1,0.1,0.2,0]).normalized
-quatDMP.goalQuat = qt.array([1.001,0.1001,-0.2001,0.001]).normalized
+quatDMP.goalQuat = qt.array([0,1,0,1]).normalized
 
 ## init pybullet env
-kuka = Manipulator(initEndeffectorPos= initPos,initEndeffectorOrientation= quatDMP.initQuat.ndarray)
+kuka = Manipulator(initEndeffectorPos= initPos,initEndeffectorOrientation=
+                   tf.convertTo_pybulletQuat(quatDMP.initQuat))
 
 ## generate the demo trajectories.
 position = tf.generate3DTraj(initPos,initVel,finalPos,dmp.totaltime,dmp.t)
@@ -51,8 +52,8 @@ pb_orient,pb_position = [],[]
 for i in range(len(dmp.t)):
     
     kuka.setParams()
-    #kuka.getInverseKinematics(dmp_position[i],dmp_pbQuat[i])
-    kuka.getInverseKinematics(dmp_position[i])
+    kuka.getInverseKinematics(dmp_position[i],dmp_pbQuat[i])
+    #kuka.getInverseKinematics(dmp_position[i])
     pb.setJointMotorControlArray(kuka.armID,kuka.controlJoints,pb.POSITION_CONTROL,
                                  targetPositions = kuka.kinematics.inv_jointPosition)
     
@@ -64,76 +65,76 @@ for i in range(len(dmp.t)):
 pb_orient = np.array(pb_orient)
 pb_position = np.array(pb_position)
 
-# ## ? 2D plots.
-# fig,ax = plt.subplots(4,1,sharex= True)
+## ? 2D plots.
+fig,ax = plt.subplots(4,1,sharex= True)
 
-# ax[0].plot(dmp.t,position[:,0],label='Demo')
-# ax[0].plot(dmp.t,dmp_position[:,0],label='DMP')
-# ax[0].plot(dmp.t,pb_position[:,0],label='pybullet')
-# ax[0].set_xlabel('t')
-# ax[0].set_ylabel('X')
+ax[0].plot(dmp.t,position[:,0],label='Demo')
+ax[0].plot(dmp.t,dmp_position[:,0],label='DMP')
+ax[0].plot(dmp.t,pb_position[:,0],label='pybullet')
+ax[0].set_xlabel('t')
+ax[0].set_ylabel('X')
 
-# ax[1].plot(dmp.t,position[:,1],label='Demo')
-# ax[1].plot(dmp.t,dmp_position[:,1],label='DMP')
-# ax[1].plot(dmp.t,pb_position[:,1],label='pybullet')
-# ax[1].set_xlabel('t')
-# ax[1].set_ylabel('Y')
+ax[1].plot(dmp.t,position[:,1],label='Demo')
+ax[1].plot(dmp.t,dmp_position[:,1],label='DMP')
+ax[1].plot(dmp.t,pb_position[:,1],label='pybullet')
+ax[1].set_xlabel('t')
+ax[1].set_ylabel('Y')
 
-# ax[2].plot(dmp.t,position[:,2],label='Demo')
-# ax[2].plot(dmp.t,dmp_position[:,2],label='DMP')
-# ax[2].plot(dmp.t,pb_position[:,2],label='pybullet')
-# ax[2].set_xlabel('t')
-# ax[2].set_ylabel('z')
-# ax[2].legend()
+ax[2].plot(dmp.t,position[:,2],label='Demo')
+ax[2].plot(dmp.t,dmp_position[:,2],label='DMP')
+ax[2].plot(dmp.t,pb_position[:,2],label='pybullet')
+ax[2].set_xlabel('t')
+ax[2].set_ylabel('z')
+ax[2].legend()
 
 euclidiean_norm = np.linalg.norm((position - dmp_position) , axis= 1) ## ^ euclidiean norm for position.
-# ax[3].plot(dmp.t,euclidiean_norm,label='Error Norm')
-# ax[3].legend()
+ax[3].plot(dmp.t,euclidiean_norm,label='Error Norm')
+ax[3].legend()
 
-# rotation = rotation.ndarray
-# dmp_quaternion = dmp_quaternion.ndarray
+rotation = rotation.ndarray
+dmp_quaternion = dmp_quaternion.ndarray
 
-# rotationError = np.linalg.norm(rotation - dmp_quaternion,axis=1)
+rotationError = np.linalg.norm(rotation - dmp_quaternion,axis=1)
 
-# figQuat,axQuat = plt.subplots(5,1,sharex=True)
+figQuat,axQuat = plt.subplots(5,1,sharex=True)
 
-# axQuat[0].plot(quatDMP.t,rotation[:,0],label='Demo')
-# axQuat[0].plot(quatDMP.t,dmp_quaternion[:,0],label = "DMP")
-# axQuat[0].plot(quatDMP.t,pb_orient[:,3],label = "pybullet")
-# axQuat[0].set_xlabel('T(s)')
-# axQuat[0].set_ylabel('W')
+axQuat[0].plot(quatDMP.t,rotation[:,0],label='Demo')
+axQuat[0].plot(quatDMP.t,dmp_quaternion[:,0],label = "DMP")
+axQuat[0].plot(quatDMP.t,pb_orient[:,3],label = "pybullet")
+axQuat[0].set_xlabel('T(s)')
+axQuat[0].set_ylabel('W')
 
-# axQuat[1].plot(quatDMP.t,rotation[:,1],label='Demo')
-# axQuat[1].plot(quatDMP.t,dmp_quaternion[:,1],label='Demo')
-# axQuat[1].plot(quatDMP.t,pb_orient[:,0],label = "pybullet")
-# axQuat[1].set_ylabel('X')
+axQuat[1].plot(quatDMP.t,rotation[:,1],label='Demo')
+axQuat[1].plot(quatDMP.t,dmp_quaternion[:,1],label='Demo')
+axQuat[1].plot(quatDMP.t,pb_orient[:,0],label = "pybullet")
+axQuat[1].set_ylabel('X')
 
-# axQuat[2].plot(quatDMP.t,rotation[:,2],label='Demo')
-# axQuat[2].plot(quatDMP.t,dmp_quaternion[:,2],label='DMP')
-# axQuat[2].plot(quatDMP.t,pb_orient[:,1],label = "pybullet")
-# axQuat[2].set_ylabel('Y')
+axQuat[2].plot(quatDMP.t,rotation[:,2],label='Demo')
+axQuat[2].plot(quatDMP.t,dmp_quaternion[:,2],label='DMP')
+axQuat[2].plot(quatDMP.t,pb_orient[:,1],label = "pybullet")
+axQuat[2].set_ylabel('Y')
 
-# axQuat[3].plot(quatDMP.t,rotation[:,3],label='Demo')
-# axQuat[3].plot(quatDMP.t,dmp_quaternion[:,3],label = "DMP")
-# axQuat[3].plot(quatDMP.t,pb_orient[:,2],label = "pybullet")
-# axQuat[3].set_ylabel('Z')
-# axQuat[3].legend()
+axQuat[3].plot(quatDMP.t,rotation[:,3],label='Demo')
+axQuat[3].plot(quatDMP.t,dmp_quaternion[:,3],label = "DMP")
+axQuat[3].plot(quatDMP.t,pb_orient[:,2],label = "pybullet")
+axQuat[3].set_ylabel('Z')
+axQuat[3].legend()
 
-# axQuat[4].plot(quatDMP.t,rotationError,label='error')
-# axQuat[4].legend()
+axQuat[4].plot(quatDMP.t,rotationError,label='error')
+axQuat[4].legend()
 
 
-# ## ? 3D plot.
+## ? 3D plot.
 
-# fig3D = plt.figure()
-# ax3D = plt.axes(projection = '3d')
-# ax3D.plot3D(position[:,0],position[:,1],position[:,2],label='Demo')
-# ax3D.plot3D(dmp_position[:,0],dmp_position[:,1],dmp_position[:,2],label='DMP')
-# ax3D.set_xlabel('X')
-# ax3D.set_ylabel('Y')
-# ax3D.set_zlabel('Z')
-# ax3D.legend()
+fig3D = plt.figure()
+ax3D = plt.axes(projection = '3d')
+ax3D.plot3D(position[:,0],position[:,1],position[:,2],label='Demo')
+ax3D.plot3D(dmp_position[:,0],dmp_position[:,1],dmp_position[:,2],label='DMP')
+ax3D.set_xlabel('X')
+ax3D.set_ylabel('Y')
+ax3D.set_zlabel('Z')
+ax3D.legend()
 
-# plt.show()
+plt.show()
 
     
