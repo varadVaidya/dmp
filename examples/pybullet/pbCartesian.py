@@ -10,6 +10,7 @@ import utils.trajFuncs as tf
 from utils.manipulation.manipulator import Manipulator
 from time import sleep
 import quaternionic as qt
+import pybullet_utils.transformations as trans
 
 totaltime = 10
 #kuka.setInitPos(endEffectorPos= [0.3 0.2 0.5] , endEffectorOrientation= [0,0,0,1])
@@ -23,10 +24,10 @@ quatDMP = QuaternionDMP(alpha = 40, cs_alpha = 1,N_bfs=100,totaltime = totaltime
 initPos,initVel,finalPos = np.array([
     [0,0,1],
     [0,0,0],
-    [0.1,0.2,0.8],
+    [-0.1,0.2,0.8],
 ])
 quatDMP.initQuat = qt.array([1,0.1,0.2,0]).normalized
-quatDMP.goalQuat = qt.array([0,1,0,1]).normalized
+quatDMP.goalQuat = qt.array([-0.5,1,0.5,1]).normalized
 
 ## init pybullet env
 kuka = Manipulator(initEndeffectorPos= initPos,initEndeffectorOrientation=
@@ -49,14 +50,36 @@ if len(dmp_position) != len(dmp_pbQuat):
 
 pb_orient,pb_position = [],[]
 
+Kp = 550 * np.diag([0.1,0.1,0.1,0.08,0.08,0.08])
+def velocityControl(i):
+    
+    positionError = dmp_position[i] - np.array(kuka.kinematics.linkPosition)   
+    currentQuat = kuka.kinematics.linkOrientation
+    desiredOrientation = dmp_pbQuat[i]
+    
+    errorQuat = trans.quaternion_multiply(desiredOrientation, 
+                                          trans.quaternion_conjugate(currentQuat))
+    
+    orientationError = errorQuat[0:3] * np.sign(errorQuat[3])
+    
+    posError = np.hstack((positionError,orientationError))
+        
+    commandVelocity = Kp.dot(posError)
+    commandJointVelocity = kuka.kinematics.geometricJacobianInv.dot(commandVelocity)
+    
+    pb.setJointMotorControlArray(kuka.armID ,kuka.controlJoints ,pb.VELOCITY_CONTROL,targetVelocities=commandJointVelocity)    
+    
+
 for i in range(len(dmp.t)):
     
     kuka.setParams()
-    kuka.getInverseKinematics(dmp_position[i],dmp_pbQuat[i])
-    #kuka.getInverseKinematics(dmp_position[i])
-    pb.setJointMotorControlArray(kuka.armID,kuka.controlJoints,pb.POSITION_CONTROL,
-                                 targetPositions = kuka.kinematics.inv_jointPosition)
     
+    
+    # kuka.getInverseKinematics(dmp_position[i],dmp_pbQuat[i])
+    # #kuka.getInverseKinematics(dmp_position[i])
+    # pb.setJointMotorControlArray(kuka.armID,kuka.controlJoints,pb.POSITION_CONTROL,
+    #                              targetPositions = kuka.kinematics.inv_jointPosition)
+    velocityControl(i)
     pb_orient.append(kuka.kinematics.linkOrientation)
     pb_position.append(kuka.kinematics.linkPosition)
     pb.stepSimulation()

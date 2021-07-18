@@ -164,8 +164,15 @@ class PositionDMP():
             self.ddp = (self.alpha * (self.beta * (self.goalPos - self.p) - self.cs.tau* self.dp ) + forcing_(x) ) * 1/self.cs.tau
         
         if self.obstacle is not None and self.n_dim == self.obstacle.n_dim:
+            
+            relativePosition = self.p - self.obstacle.initPos
+            relativeVelocity = self.dp - self.obstacle.currentVel
+            obstacleForce = self.obstacle.obstacle_force(relativeVelocity,relativePosition)
+            print(obstacleForce)
             self.ddp = (self.alpha * (self.beta * (self.goalPos - self.p) - self.cs.tau* self.dp ) 
-                        + forcing_(x) + self.obstacle.obstacle_force(self.dp,(self.p - self.obstacle.initPos)) ) * 1/self.cs.tau
+                        + forcing_(x) 
+                        +  obstacleForce
+                        ) * 1/self.cs.tau
             
         self.dp += self.ddp * self.dt
         
