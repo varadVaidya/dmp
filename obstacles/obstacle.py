@@ -11,17 +11,24 @@ class Obstacle():
         
         if initPos is None:
             self.initPos = np.zeros(self.n_dim) ## the initial position of the obstacle
-            #self.initVel = np.zeros(3) ## initial velocity of of the obstacle
-        else:
+            self.initVel = np.zeros(self.n_dim) ## initial velocity of of the obstacle
+            
+        if initPos is not None:
+            
             self.initPos = initPos
-            #self.initVel = initVel
+            
+            if initVel is None:
+                self.initVel = np.zeros(self.n_dim) ## the initial velocity of the obstacle
+            
+            else:
+                self.initVel = initVel
         
         self.currentPos = self.initPos.copy() ## current position of the obstacle
-        #self.currentVel = self.initVel.copy() ## current velocity of the obstacle
+        self.currentVel = self.initVel.copy() ## current velocity of the obstacle
         ## parameters for the dynamic potential field.
         self.speed = np.zeros(self.n_dim) ## speed of the obstacle.
-        self.lambda_ = 3
-        self.beta = 2
+        self.lambda_ = 1
+        self.beta = 1
     
     def get_distance(self,X):
         ## distance between obstacle and position of the end effector
@@ -91,14 +98,17 @@ class Obstacle():
         
     def step(self,dt):
         self.currentPos += self.speed * dt
+        self.currentVel = self.speed
+        
 if __name__ == "__main__":
     
     #import numpy as np
-    o1 = Obstacle(n_dim=2) ## 0,0
+    o1 = Obstacle(initPos = np.array([1,1]) , n_dim=2) ## 0,0
     v = np.array([1,1]) ## velocity of the end effector
-    x = np.array([-1,-1]) ## position of the end effector
+    x = np.array([-0.9,-0.9]) ## position of the end effector
     
-    obstacle_force = o1.obstacle_force(v,x)
+    r_x = x - o1.currentPos
+    obstacle_force = o1.obstacle_force(v,r_x)
     print(obstacle_force)      
         
         
