@@ -7,6 +7,7 @@ sys.path.append( sys.path[0] +'/../..')
 from positionDMP.dmp_position import PositionDMP
 from positionDMP.dmp_quat import QuaternionDMP
 import utils.trajFuncs as tf
+import utils.plotFuncs as pf
 from utils.manipulation.manipulator import Manipulator
 from time import sleep
 import quaternionic as qt
@@ -87,65 +88,8 @@ for i in range(len(dmp.t)):
 
 pb_orient = np.array(pb_orient)
 pb_position = np.array(pb_position)
-
-## ? 2D plots.
-fig,ax = plt.subplots(4,1,sharex= True)
-
-ax[0].plot(dmp.t,position[:,0],label='Demo')
-ax[0].plot(dmp.t,dmp_position[:,0],label='DMP')
-ax[0].plot(dmp.t,pb_position[:,0],label='pybullet')
-ax[0].set_xlabel('t')
-ax[0].set_ylabel('X')
-
-ax[1].plot(dmp.t,position[:,1],label='Demo')
-ax[1].plot(dmp.t,dmp_position[:,1],label='DMP')
-ax[1].plot(dmp.t,pb_position[:,1],label='pybullet')
-ax[1].set_xlabel('t')
-ax[1].set_ylabel('Y')
-
-ax[2].plot(dmp.t,position[:,2],label='Demo')
-ax[2].plot(dmp.t,dmp_position[:,2],label='DMP')
-ax[2].plot(dmp.t,pb_position[:,2],label='pybullet')
-ax[2].set_xlabel('t')
-ax[2].set_ylabel('z')
-ax[2].legend()
-
-euclidiean_norm = np.linalg.norm((position - dmp_position) , axis= 1) ## ^ euclidiean norm for position.
-ax[3].plot(dmp.t,euclidiean_norm,label='Error Norm')
-ax[3].legend()
-
-rotation = rotation.ndarray
-dmp_quaternion = dmp_quaternion.ndarray
-
-rotationError = np.linalg.norm(rotation - dmp_quaternion,axis=1)
-
-figQuat,axQuat = plt.subplots(5,1,sharex=True)
-
-axQuat[0].plot(quatDMP.t,rotation[:,0],label='Demo')
-axQuat[0].plot(quatDMP.t,dmp_quaternion[:,0],label = "DMP")
-axQuat[0].plot(quatDMP.t,pb_orient[:,3],label = "pybullet")
-axQuat[0].set_xlabel('T(s)')
-axQuat[0].set_ylabel('W')
-
-axQuat[1].plot(quatDMP.t,rotation[:,1],label='Demo')
-axQuat[1].plot(quatDMP.t,dmp_quaternion[:,1],label='Demo')
-axQuat[1].plot(quatDMP.t,pb_orient[:,0],label = "pybullet")
-axQuat[1].set_ylabel('X')
-
-axQuat[2].plot(quatDMP.t,rotation[:,2],label='Demo')
-axQuat[2].plot(quatDMP.t,dmp_quaternion[:,2],label='DMP')
-axQuat[2].plot(quatDMP.t,pb_orient[:,1],label = "pybullet")
-axQuat[2].set_ylabel('Y')
-
-axQuat[3].plot(quatDMP.t,rotation[:,3],label='Demo')
-axQuat[3].plot(quatDMP.t,dmp_quaternion[:,3],label = "DMP")
-axQuat[3].plot(quatDMP.t,pb_orient[:,2],label = "pybullet")
-axQuat[3].set_ylabel('Z')
-axQuat[3].legend()
-
-axQuat[4].plot(quatDMP.t,rotationError,label='error')
-axQuat[4].legend()
-
+pf.plotPosition(dmp.t,position,dmp_position,pb_position)
+pf.plotQuaternions(quatDMP.t,rotation.ndarray,dmp_quaternion.ndarray,pb_orient) ## pass the md array version of the quaternion class matrix
 
 ## ? 3D plot.
 
