@@ -27,12 +27,15 @@ class Obstacle():
         self.currentVel = self.initVel.copy() ## current velocity of the obstacle
         ## parameters for the dynamic potential field.
         self.speed = np.zeros(self.n_dim) ## speed of the obstacle.
-        self.lambda_ = 1
-        self.beta = 1
+        self.lambda_ = 5
+        self.beta = 2
+        self.obstaclePos = []
+        
+        
     
     def get_distance(self,X):
         ## distance between obstacle and position of the end effector
-        distance = np.linalg.norm(X - self.currentPos)
+        distance = np.linalg.norm(X)
         return distance
         
     def get_cosine_angle(self,V,X):
@@ -97,15 +100,15 @@ class Obstacle():
             return np.zeros(self.n_dim)
         
     def step(self,dt):
-        self.currentPos += self.speed * dt
-        self.currentVel = self.speed
+        self.obstaclePos.append(self.currentPos)
+        self.currentPos = self.currentPos + self.speed * dt
         
 if __name__ == "__main__":
     
     #import numpy as np
     o1 = Obstacle(initPos = np.array([1,1]) , n_dim=2) ## 0,0
     v = np.array([1,1]) ## velocity of the end effector
-    x = np.array([-0.9,-0.9]) ## position of the end effector
+    x = np.array([0.9,0.9]) ## position of the end effector
     
     r_x = x - o1.currentPos
     obstacle_force = o1.obstacle_force(v,r_x)

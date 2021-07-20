@@ -7,13 +7,13 @@ from obstacles.obstacle import Obstacle
 from utils.trajFuncs import generate3DTraj
 
 ## init the obstacle
-o1 = Obstacle()
+o1 = Obstacle(initPos=np.array([-0.3,-0.4,-0.3]))
 dmp = PositionDMP(N_bfs=100,alpha= 30,cs_alpha=5,totaltime = 5,obstacle = o1) ## ^ init the DMP class.
 
 initPos,initVel,finalPos = np.array([
     [-2,-2,-2],
     [0,0,0],
-    [1,1,1.1],
+    [1,1,1.1]
 ])
 
 position = generate3DTraj(initPos,initVel,finalPos,dmp.totaltime,dmp.t)

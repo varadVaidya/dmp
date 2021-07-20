@@ -165,19 +165,22 @@ class PositionDMP():
         
         if self.obstacle is not None and self.n_dim == self.obstacle.n_dim:
             
-            relativePosition = self.p - self.obstacle.initPos
-            relativeVelocity = self.dp - self.obstacle.currentVel
+            relativePosition = self.p - self.obstacle.currentPos
+            relativeVelocity = self.dp
             obstacleForce = self.obstacle.obstacle_force(relativeVelocity,relativePosition)
-            print(obstacleForce)
+            # print(obstacleForce)
             self.ddp = (self.alpha * (self.beta * (self.goalPos - self.p) - self.cs.tau* self.dp ) 
                         + forcing_(x) 
                         +  obstacleForce
                         ) * 1/self.cs.tau
             
+        self.obstacle.step(self.dt)
+        
         self.dp += self.ddp * self.dt
         
         self.p += self.dp * self.dt
         return self.p, self.dp, self.ddp ## ~ returned to plot stuff later on
+
         
     def rollout(self,position):
         

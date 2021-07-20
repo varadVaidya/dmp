@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.animation as animation
 
 def plotPosition(time,position,dmp_position,pb_position):
     """
@@ -70,4 +71,107 @@ def plotQuaternions(time,rotation,dmp_quaternion,pb_orient):
 
     plt.show()
         
+def animatePositionDMP2D(time,position,dmp_position,obstaclePosition = None,saveVideo = False):
+    
+    if obstaclePosition is None:
         
+        time_min,time_max = np.min(time),np.max(time)
+        
+        xmin,xmax = np.min(position[:,0]),np.max(position[:,0])
+        ymin,ymax = np.min(position[:,1]),np.max(position[:,1])
+        
+        xmax += np.absolute(xmax/5)
+        ymax += np.absolute(ymax/5)
+        
+        xmin -= np.absolute(xmin/5)
+        ymin -= np.absolute(ymin/5)
+        
+        fig = plt.figure()
+        ax = plt.axes(xlim=(xmin,xmax),ylim=(ymin,ymax))
+        
+        line, = ax.plot([], [], lw=2) ## line 1 is provided traj.
+        line2, = ax.plot([], [] , lw=2) ## line 2 is the dmp traj.
+        # line3, = ax.plot([], [] , lw=2)
+        
+        posX,posY,dmpPosX,dmpPosY = [],[],[],[]
+        
+        def init():
+            line.set_data(position[:,0],position[:,1] )
+            line2.set_data(dmp_position[:,0],dmp_position[:,1])
+            
+            return line,line2
+        
+        def animate(i):
+            
+            posX.append(position[i,0])
+            posY.append(position[i,1])
+            dmpPosX.append(dmp_position[i,0])
+            dmpPosY.append(dmp_position[i,1])
+            
+            line.set_data(posX,posY)
+            line2.set_data(dmpPosX,dmpPosY)
+            
+            return line,line2
+        
+        ani = animation.FuncAnimation(fig, animate, init_func=init,interval = 1,frames= len(time),repeat=False)
+        plt.show()    
+    
+    if obstaclePosition is not None:
+        
+        time_min,time_max = np.min(time),np.max(time)
+        
+        xmin,xmax = np.min(position[:,0]),np.max(position[:,0])
+        ymin,ymax = np.min(position[:,1]),np.max(position[:,1])
+        
+        xmax += np.absolute(xmax/5)
+        ymax += np.absolute(ymax/5)
+        
+        xmin -= np.absolute(xmin/5)
+        ymin -= np.absolute(ymin/5)
+        
+        fig = plt.figure()
+        ax = plt.axes(xlim=(xmin,xmax),ylim=(ymin,ymax))
+        
+        line, = ax.plot([], [], lw=2) ## line 1 is provided traj.
+        line2, = ax.plot([], [] , lw=2) ## line 2 is the dmp traj.
+        line3, = ax.plot([], [] , lw=2) ## line 3 is the obstacle traj.])
+        # line3, = ax.plot([], [] , lw=2)
+        
+        posX,posY,dmpPosX,dmpPosY = [],[],[],[]
+        obsX,obsY = [],[]
+        
+        def init():
+            line.set_data(position[:,0],position[:,1] )
+            line2.set_data(dmp_position[:,0],dmp_position[:,1])
+            line3.set_data(obstaclePosition[:,0],obstaclePosition[:,1])
+            
+            return line,line2,line3
+        
+        def animate(i):
+            
+            posX.append(position[i,0])
+            posY.append(position[i,1])
+            dmpPosX.append(dmp_position[i,0])
+            dmpPosY.append(dmp_position[i,1])
+            
+            obsX.append(obstaclePosition[i,0])
+            obsY.append(obstaclePosition[i,1])
+            
+            line.set_data(posX,posY)
+            line2.set_data(dmpPosX,dmpPosY)
+            line3.set_data(obsX,obsY)
+            
+            return line,line2,line3
+        
+        ani = animation.FuncAnimation(fig, animate, init_func=init,interval = 1,frames= len(time),repeat=False)
+        
+        if saveVideo:    
+            writerVideo = animation.writers['ffmpeg'](fps=30)
+            ani.save('dmp_position.mp4',writerVideo)
+         
+        plt.show()  
+        
+        
+    
+    
+    

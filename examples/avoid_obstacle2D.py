@@ -5,15 +5,18 @@ sys.path.append( sys.path[0] +'/..')
 from positionDMP.dmp_position import PositionDMP
 from obstacles.obstacle import Obstacle
 from utils.trajFuncs import generate2DTraj
+import utils.plotFuncs as pf
 
-o1 = Obstacle(initPos=np.array([0,0]),n_dim=2)
+
+o1 = Obstacle(initPos=np.array([0,1]),n_dim=2)
+o1.speed = np.array([-0.1,-0.1])
 
 dmp = PositionDMP(N_bfs=100,alpha= 30,cs_alpha=3,totaltime = 5,cs_tau = 1,n_dim = 2,obstacle = o1) ## ^ init the DMP class.
 
 initPos,initVel,finalPos = np.array([
-    [-1,-1],
-    [0,0],
-    [1.3,1.1],
+    [-4,3],
+    [-1,2],
+    [4,-3],
 ])
 
 position = generate2DTraj(initPos,initVel,finalPos,dmp.totaltime,dmp.t)
@@ -21,6 +24,8 @@ position = generate2DTraj(initPos,initVel,finalPos,dmp.totaltime,dmp.t)
 dmp.train(position) ## ^ train the DMP
 
 dmp_position = dmp.rollout(position) ## ^ simulate
+
+o1.obstaclePos = np.array(o1.obstaclePos)
 
 euclidiean_norm = np.linalg.norm((position - dmp_position) , axis= 1) ## ^ euclidiean norm
 
@@ -47,3 +52,6 @@ ax2.plot(dmp_position[:,0],dmp_position[:,1],label='dmp')
 ax2.plot(o1.initPos[0],o1.initPos[1],'ro',label='obstacle')
 ax2.legend()
 plt.show()
+
+pf.animatePositionDMP2D(dmp.t,position,dmp_position,obstaclePosition= o1.obstaclePos,saveVideo=True)   
+
