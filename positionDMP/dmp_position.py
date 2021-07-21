@@ -174,7 +174,7 @@ class PositionDMP():
                         +  obstacleForce
                         ) * 1/self.cs.tau
             
-        self.obstacle.step(self.dt)
+            self.obstacle.step(self.dt)
         
         self.dp += self.ddp * self.dt
         
