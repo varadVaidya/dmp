@@ -8,12 +8,13 @@ from utils.trajFuncs import generate3DTraj
 import utils.plotFuncs as pf
 
 ## init the obstacle
-o1 = Obstacle(initPos=np.array([-0.3,-0.4,0]))
+o1 = Obstacle(initPos=np.array([-0.3,-0.3,0]))
+o1.speed = np.array([-0.2,0.3,0])
 dmp = PositionDMP(N_bfs=100,alpha= 30,cs_alpha=5,totaltime = 5,obstacle = o1) ## ^ init the DMP class.
 
 initPos,initVel,finalPos = np.array([
     [-2,-2,-2],
-    [0,1,-1],
+    [0,0,0],
     [1,1,1.1]
 ])
 
@@ -21,12 +22,12 @@ position = generate3DTraj(initPos,initVel,finalPos,dmp.totaltime,dmp.t)
 dmp.train(position) ## ^ train the DMP
 
 dmp_position = dmp.rollout(position) ## ^ simulate
-
+o1.obstaclePos = np.array(o1.obstaclePos)
 euclidiean_norm = np.linalg.norm((position - dmp_position) , axis= 1) ## ^ euclidiean norm
 
 ## plot stuff...
 pf.plotPosition(dmp.t,position,dmp_position)
-pf.animatePositionDMP3D(dmp.t,position,dmp_position)
+pf.animatePositionDMP3D(dmp.t,position,dmp_position,o1.obstaclePos)
 
 ## ? 3D plot.
 

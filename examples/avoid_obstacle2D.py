@@ -8,8 +8,8 @@ from utils.trajFuncs import generate2DTraj
 import utils.plotFuncs as pf
 
 
-o1 = Obstacle(initPos=np.array([0,1]),n_dim=2)
-o1.speed = np.array([-0.1,-0.1])
+o1 = Obstacle(initPos=np.array([0,2]),n_dim=2)
+o1.speed = np.array([-0.2,-0.2])
 
 dmp = PositionDMP(N_bfs=100,alpha= 30,cs_alpha=3,totaltime = 5,cs_tau = 1,n_dim = 2,obstacle = o1) ## ^ init the DMP class.
 
