@@ -28,7 +28,7 @@ class Obstacle():
         ## parameters for the dynamic potential field.
         self.speed = np.zeros(self.n_dim) ## speed of the obstacle.
         self.lambda_ = 5
-        self.beta = 2
+        self.beta = 3
         self.obstaclePos = []
         
         
@@ -51,7 +51,7 @@ class Obstacle():
     
     def grad_P(self,X):
         
-        delta_P = (X - self.currentPos)/self.get_distance(X)
+        delta_P = (X)/self.get_distance(X)
         
         return delta_P
     

@@ -29,7 +29,7 @@ class Obstacle():
         ## parameters for the dynamic potential field.
         self.speed = np.zeros(self.n_dim) ## speed of the obstacle.
         self.lambda_ = 5
-        self.beta = 2
+        self.beta = 3
         self.obstaclePos = []
         
         
@@ -56,7 +56,7 @@ class Obstacle():
     
     def grad_P(self,X):
         
-        delta_P = (X - self.currentPos)/self.get_distance(X)[:,None]
+        delta_P = (X)/self.get_distance(X)[:,None]
         return delta_P
     
     def grad_cosine_angle(self,V,X):
@@ -134,41 +134,7 @@ class Obstacle():
         
     def step(self,dt):
         self.obstaclePos.append(self.currentPos)
-        self.currentPos = self.currentPos + self.speed * dt
-
-class MultiObstacle(Obstacle):
-    
-    def __init__(self,numObs = 1,n_dim = 3,initPos = None ,initVel = None):
-        
-        Obstacle.__init__(self,n_dim = n_dim,initPos = initPos,initVel = initVel)
-        self.numObs = numObs
-        self.obstacleList = [None] * self.numObs
-        
-        for i in range(self.numObs):
-            self.obstacleList[i] = Obstacle(n_dim = self.n_dim,initPos = self.initPos[i],initVel = self.initVel[i])
-    
-    def multiObstacleForce(self,V,X):
-        
-        obstacleForce = [None] * self.numObs
-        
-        for i in range(self.numObs):
-            print("FFFFFFFFFFFFFFFF x shape",X.shape)
-            print("FFFFFFFFFFFFFFFF x values",X[i])
-            print("FFFFFFFFFFFFFFFF V shape",V.shape)
-            print("FFFFFFFFFFFFFFFF V values",V)
-            
-            obstacleForce[i] = self.obstacleList[i].obstacle_force(V,X[i])
-        
-        obstacleForce = np.array(obstacleForce)
-        
-        return obstacleForce
-    
-    def multiStep(self,dt):
-        
-        for i in range(self.numObs):
-            self.obstacleList[i].step(dt)
-            
-        
+        self.currentPos = self.currentPos + self.currentVel * dt       
           
 if __name__ == "__main__":
     
