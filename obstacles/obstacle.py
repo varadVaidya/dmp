@@ -26,8 +26,7 @@ class Obstacle():
         self.currentPos = self.initPos.copy() ## current position of the obstacle
         self.currentVel = self.initVel.copy() ## current velocity of the obstacle
         ## parameters for the dynamic potential field.
-        self.speed = np.zeros(self.n_dim) ## speed of the obstacle.
-        self.lambda_ = 5
+        self.lambda_ = 50
         self.beta = 3
         self.obstaclePos = []
         
@@ -101,7 +100,7 @@ class Obstacle():
         
     def step(self,dt):
         self.obstaclePos.append(self.currentPos)
-        self.currentPos = self.currentPos + self.speed * dt
+        self.currentPos = self.currentPos + self.currentVel * dt
         
 if __name__ == "__main__":
     

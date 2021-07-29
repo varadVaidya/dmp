@@ -8,9 +8,9 @@ from utils.trajFuncs import generate3DTraj
 import utils.plotFuncs as pf
 
 ## init the obstacle
+extrapolteFlag = False
 o1 = Obstacle(initPos=np.array([-0.3,-0.3,0]))
-o1.speed = np.array([-0.2,0.3,0])
-dmp = PositionDMP(N_bfs=100,alpha= 30,cs_alpha=5,totaltime = 5,obstacle = o1) ## ^ init the DMP class.
+dmp = PositionDMP(N_bfs=100,alpha= 30,cs_alpha=5,totaltime = 5,obstacle = o1,extrapolate= extrapolteFlag) ## ^ init the DMP class.
 
 initPos,initVel,finalPos = np.array([
     [-2,-2,-2],

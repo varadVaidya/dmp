@@ -3,6 +3,7 @@ sys.path.append( sys.path[0] +'/..')
 import numpy as np
 from positionDMP.csSystem import CanonicalSystem 
 import matplotlib.pyplot as plt
+from obstacles.extrapolate import extrapolateTrajectory
 ## placeholder class for testing. used from previous version.
 class Gaussian():
     
@@ -19,16 +20,17 @@ class Gaussian():
     
 class PositionDMP():
     
-    def __init__(self,alpha,cs_alpha,N_bfs = 10,totaltime = 10,cs_tau = 1,n_dim = 3,obstacle = None):
+    def __init__(self,alpha,cs_alpha,N_bfs = 10,totaltime = 10,cs_tau = 1,n_dim = 3,obstacle = None,extrapolate = False):
         
         self.N_bfs = N_bfs
         self.alpha = alpha
         self.beta = self.alpha/4
         self.totaltime = totaltime
         self.cs_alpha = cs_alpha
-        self.t = np.linspace(0,totaltime,int(totaltime/0.01) + 1)
+        self.t = np.linspace(0,totaltime,int(totaltime/0.001) + 1)
         self.dt = self.t[1] - self.t[0]
         self.n_dim = n_dim
+        self.extrapolate = extrapolate
         # scaling factor.
         self.Dp = np.identity(self.n_dim)
         
@@ -47,6 +49,7 @@ class PositionDMP():
         self.goalPos = np.zeros(self.n_dim)
         
         self.obstacle = obstacle
+        self.count = 0
         self.reset()
     
     def reset(self):
@@ -167,8 +170,22 @@ class PositionDMP():
             
             relativePosition = self.p - self.obstacle.currentPos
             relativeVelocity = self.dp
-            obstacleForce = self.obstacle.obstacle_force(relativeVelocity,relativePosition)
-            # print(obstacleForce)
+            
+            if self.extrapolate is True:
+                
+                isObstacleClose = False
+                
+                if self.count % 4 == 0:
+                    isObstacleClose = extrapolateTrajectory(self.p,self.dp,self.obstacle.currentPos,self.obstacle.currentVel,
+                                                        extrapolateTime= 2,
+                                                        dt = self.dt,tolerance= 0.01)
+                self.count = self.count + 1
+                
+                obstacleForce = self.obstacle.obstacle_force(relativeVelocity,relativePosition) if isObstacleClose else 0
+               
+            else:
+                obstacleForce = self.obstacle.obstacle_force(relativeVelocity,relativePosition)
+                
             self.ddp = (self.alpha * (self.beta * (self.goalPos - self.p) - self.cs.tau* self.dp ) 
                         + forcing_(x) 
                         +  obstacleForce
