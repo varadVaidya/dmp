@@ -7,11 +7,21 @@ from utils.manipulation.kinematics import Kinematics
 
 class Manipulator():
     
-    def __init__(self,initJointAngles = None,initEndeffectorPos = None,initEndeffectorOrientation = None):
+    def __init__(self,initJointAngles = None,initEndeffectorPos = None,initEndeffectorOrientation = None,
+                 basePosition = None,baseOrientation = None):
         ## init kuka robot and plane.
         pb.connect(pb.GUI)
         pb.setAdditionalSearchPath(pybullet_data.getDataPath())
-        self.armID = pb.loadURDF("kuka_iiwa/model.urdf",[0,0,0],useFixedBase=True)
+        
+        if basePosition is None:
+            self.armID = pb.loadURDF("kuka_iiwa/model.urdf",[0,0,0],useFixedBase=True)
+        
+        if basePosition is not None:
+            if baseOrientation is None:
+                self.armID = pb.loadURDF("kuka_iiwa/model.urdf",basePosition,useFixedBase=True)
+            else: 
+                self.armID = pb.loadURDF("kuka_iiwa/model.urdf",basePosition,baseOrientation,useFixedBase=True)
+            
         self.plane = pb.loadURDF("plane.urdf")
         print(self.armID , "arm id")
         ## add gravity

@@ -9,8 +9,8 @@ import utils.plotFuncs as pf
 
 obsPos = np.array([
             [1,2],
-            [0,0.5],
-            [-3.5,-1]
+            [-2,-0.2],
+            [0,0]
         ])
 
 o1 = Obstacle(numObs = 3 , n_dim = 2 , initPos = obsPos)
@@ -19,7 +19,7 @@ dmp = PositionDMP(N_bfs=100,alpha= 30,cs_alpha=3,totaltime = 5,cs_tau = 1,n_dim 
 
 initPos,initVel,finalPos = np.array([
     [-4,-3],
-    [-1,1],
+    [0,0],
     [4,3],
 ])
 

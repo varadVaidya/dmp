@@ -7,16 +7,16 @@ from obstacles.obstacle import Obstacle
 from utils.trajFuncs import generate2DTraj
 import utils.plotFuncs as pf
 
-extrapolteFlag = True
+extrapolteFlag = False
 
-o1 = Obstacle(initPos=np.array([-0.5,2]),initVel= np.array([-0.2,-0.2]),n_dim=2)
+o1 = Obstacle(initPos=np.array([0,0.05]),initVel= np.array([0,0]),n_dim=2)
 
 dmp = PositionDMP(N_bfs=100,alpha= 30,cs_alpha=3,totaltime = 5,cs_tau = 1,n_dim = 2,obstacle = o1,extrapolate= extrapolteFlag) ## ^ init the DMP class.
 
 initPos,initVel,finalPos = np.array([
-    [-4,3],
-    [-1,2],
-    [4,-3],
+    [-0.3,0.2],
+    [0.01,-0.01],
+    [0.3,-0.2],
 ])
 
 position = generate2DTraj(initPos,initVel,finalPos,dmp.totaltime,dmp.t)
@@ -53,5 +53,5 @@ ax2.plot(o1.initPos[0],o1.initPos[1],'ro',label='obstacle')
 ax2.legend()
 plt.show()
 
-pf.animatePositionDMP2D(dmp.t,position,dmp_position,obstaclePosition= o1.obstaclePos,saveVideo=True)   
+# pf.animatePositionDMP2D(dmp.t,position,dmp_position,obstaclePosition= o1.obstaclePos,saveVideo=True)   
 

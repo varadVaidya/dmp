@@ -6,6 +6,7 @@ import sys
 sys.path.append( sys.path[0] +'/../..')
 from positionDMP.dmp_position import PositionDMP
 from positionDMP.dmp_quat import QuaternionDMP
+from obstacles.obstacle import Obstacle
 import utils.trajFuncs as tf
 import utils.plotFuncs as pf
 from utils.manipulation.manipulator import Manipulator
@@ -13,28 +14,34 @@ from time import sleep
 import quaternionic as qt
 import pybullet_utils.transformations as trans
 
+
+
 totaltime = 10
-#kuka.setInitPos(endEffectorPos= [0.3 0.2 0.5] , endEffectorOrientation= [0,0,0,1])
 
-## init the DMP class for both position and quaternion
+o1 = Obstacle(initPos=np.array([0,0,0.65]) )
 
-dmp = PositionDMP(N_bfs=100,alpha= 20,cs_alpha=0.5,totaltime = totaltime,cs_tau = 1) ## ^ init the DMP class.
+dmp = PositionDMP(N_bfs=100,alpha= 20,cs_alpha=0.5,totaltime = totaltime,cs_tau = 1,obstacle = o1) ## ^ init the DMP class.
 quatDMP = QuaternionDMP(alpha = 40, cs_alpha = 1,N_bfs=100,totaltime = totaltime)  ## ^ init the DMP quaternion class
 
 ## generate position and orientation trajectory
 initPos,initVel,finalPos = np.array([
-    [0.4,0.4,0.9],
+    [-0.3,0.2,0.7],
     [0,0,0],
-    [-0.2,-0.6,0.9],
+    [0.3,-0.2,0.7],
 ])
 
-quatDMP.initQuat = qt.array([0,0,0,1]).normalized
-quatDMP.goalQuat = qt.array([0.1,0.1,0.1,0.9]).normalized
+initRPY = np.array([0,np.pi,0])
+finalRPY = np.array([0.01,np.pi-0.01,0.01])
+quatDMP.initQuat = qt.array.from_euler_angles(initRPY).normalized
+quatDMP.goalQuat = qt.array.from_euler_angles(finalRPY).normalized
 
-## init pybullet env
-# kuka = Manipulator(initEndeffectorPos= initPos,initEndeffectorOrientation=
-#                    tf.convertTo_pybulletQuat(quatDMP.initQuat))
-kuka = Manipulator()
+## load environment
+kuka = Manipulator(basePosition=[0,0.5,0.65],
+                   initEndeffectorPos= initPos,
+                   initEndeffectorOrientation=tf.convertTo_pybulletQuat(quatDMP.initQuat))
+
+#pb.loadURDF("table/table.urdf", basePosition=[0,0,0],useFixedBase= True,baseOrientation=pb.getQuaternionFromEuler((0,0,0)) )
+
 
 ## generate the demo trajectories.
 position = tf.generate3DTraj(initPos,initVel,finalPos,dmp.totaltime,dmp.t)
@@ -86,24 +93,10 @@ for i in range(len(dmp.t)):
     velocityControl(i)
     pb_orient.append(kuka.kinematics.linkOrientation)
     pb_position.append(kuka.kinematics.linkPosition)
+    # sleep(0.001)
     pb.stepSimulation()
 
 pb_orient = np.array(pb_orient)
 pb_position = np.array(pb_position)
 pf.plotPosition(dmp.t,position,dmp_position,pb_position)
-pf.plotQuaternions(quatDMP.t,rotation.ndarray,dmp_quaternion.ndarray,pb_orient) ## pass the md array version of the quaternion class matrix
-
-## ? 3D plot.
-
-fig3D = plt.figure()
-ax3D = plt.axes(projection = '3d')
-ax3D.plot3D(position[:,0],position[:,1],position[:,2],label='Demo')
-ax3D.plot3D(dmp_position[:,0],dmp_position[:,1],dmp_position[:,2],label='DMP')
-ax3D.set_xlabel('X')
-ax3D.set_ylabel('Y')
-ax3D.set_zlabel('Z')
-ax3D.legend()
-
-plt.show()
-
-    
+# pf.plotQuaternions(quatDMP.t,rotation.ndarray,dmp_quaternion.ndarray,pb_orient) ## pass the md array version of the quaternion class matrix

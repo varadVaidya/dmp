@@ -9,13 +9,13 @@ import utils.plotFuncs as pf
 
 ## init the obstacle
 extrapolteFlag = False
-o1 = Obstacle(initPos=np.array([-0.3,-0.3,0]))
+o1 = Obstacle(initPos=np.array([0,0,0.7]) )
 dmp = PositionDMP(N_bfs=100,alpha= 30,cs_alpha=5,totaltime = 5,obstacle = o1,extrapolate= extrapolteFlag) ## ^ init the DMP class.
 
 initPos,initVel,finalPos = np.array([
-    [-2,-2,-2],
+    [-0.3,0.2,0.7],
     [0,0,0],
-    [1,1,1.1]
+    [0.3,-0.2,0.701],
 ])
 
 position = generate3DTraj(initPos,initVel,finalPos,dmp.totaltime,dmp.t)

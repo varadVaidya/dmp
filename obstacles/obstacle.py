@@ -26,8 +26,8 @@ class Obstacle():
         self.currentPos = self.initPos.copy() ## current position of the obstacle
         self.currentVel = self.initVel.copy() ## current velocity of the obstacle
         ## parameters for the dynamic potential field.
-        self.lambda_ = 50
-        self.beta = 3
+        self.lambda_ = 5
+        self.beta = 2
         self.obstaclePos = []
         
         

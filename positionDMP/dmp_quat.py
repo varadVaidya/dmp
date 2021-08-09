@@ -13,7 +13,7 @@ class QuaternionDMP():
         self.beta = self.alpha/4
         self.totaltime = totaltime
         self.cs_alpha = cs_alpha
-        self.t = np.linspace(0,totaltime,int(totaltime/0.01) + 1)
+        self.t = np.linspace(0,totaltime,int(totaltime/0.001) + 1)
         self.dt = self.t[1] - self.t[0]
         
         self.cs = CanonicalSystem(alpha = self.cs_alpha,t=self.t,tau= cs_tau)
