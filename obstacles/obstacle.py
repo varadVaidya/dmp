@@ -5,7 +5,7 @@ class Obstacle():
     ## will contain all the obstacle info necessary:
     ## also has the paramerters to define the dynamic potential field
     ## obstacle can also move with time
-    def __init__(self,n_dim = 3,initPos = None ,initVel = None):
+    def __init__(self,n_dim = 3,initPos = None ,initVel = None,lambda_ = 1):
         
         self.n_dim = n_dim ## dimension in which the obstacle exists
         
@@ -26,7 +26,8 @@ class Obstacle():
         self.currentPos = self.initPos.copy() ## current position of the obstacle
         self.currentVel = self.initVel.copy() ## current velocity of the obstacle
         ## parameters for the dynamic potential field.
-        self.lambda_ = 5
+        self.lambda_ = lambda_ ## the strength of the potential field
+         
         self.beta = 2
         self.obstaclePos = []
         

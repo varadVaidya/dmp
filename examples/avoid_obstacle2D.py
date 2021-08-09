@@ -9,9 +9,9 @@ import utils.plotFuncs as pf
 
 extrapolteFlag = False
 
-o1 = Obstacle(initPos=np.array([0,0.05]),initVel= np.array([0,0]),n_dim=2)
+o1 = Obstacle(initPos=np.array([0,0]),initVel= np.array([0,0]),n_dim=2,lambda_= 0.1)
 
-dmp = PositionDMP(N_bfs=100,alpha= 30,cs_alpha=3,totaltime = 5,cs_tau = 1,n_dim = 2,obstacle = o1,extrapolate= extrapolteFlag) ## ^ init the DMP class.
+dmp = PositionDMP(N_bfs=100,alpha= 30,cs_alpha=1,totaltime = 5,cs_tau = 1,n_dim = 2,obstacle = o1) ## ^ init the DMP class.
 
 initPos,initVel,finalPos = np.array([
     [-0.3,0.2],

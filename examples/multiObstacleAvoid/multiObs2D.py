@@ -18,9 +18,9 @@ o1 = Obstacle(numObs = 3 , n_dim = 2 , initPos = obsPos)
 dmp = PositionDMP(N_bfs=100,alpha= 30,cs_alpha=3,totaltime = 5,cs_tau = 1,n_dim = 2,obstacle = o1) ## ^ init the DMP class.
 
 initPos,initVel,finalPos = np.array([
-    [-4,-3],
+    [-4,-4],
     [0,0],
-    [4,3],
+    [4,4],
 ])
 
 position = generate2DTraj(initPos,initVel,finalPos,dmp.totaltime,dmp.t)
