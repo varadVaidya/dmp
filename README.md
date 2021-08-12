@@ -1,5 +1,4 @@
-# DMP
-## currently "dynamical_systems" is archived. 
+
 
 ### Ref.
 iiwa description from : pybullet data
