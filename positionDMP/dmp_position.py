@@ -178,7 +178,7 @@ class PositionDMP():
                 if self.count % 4 == 0:
                     isObstacleClose = extrapolateTrajectory(self.p,self.dp,self.obstacle.currentPos,self.obstacle.currentVel,
                                                         extrapolateTime= 2,
-                                                        dt = self.dt,tolerance= 0.1)
+                                                        dt = self.dt,tolerance= 0.01)
                 self.count = self.count + 1
                 
                 obstacleForce = self.obstacle.obstacle_force(relativeVelocity,relativePosition) if isObstacleClose else 0

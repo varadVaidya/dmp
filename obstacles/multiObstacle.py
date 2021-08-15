@@ -29,7 +29,7 @@ class Obstacle():
         ## parameters for the dynamic potential field.
         self.speed = np.zeros(self.n_dim) ## speed of the obstacle.
         self.lambda_ = lambda_
-        self.beta = 3
+        self.beta = 2
         self.obstaclePos = []
         
         

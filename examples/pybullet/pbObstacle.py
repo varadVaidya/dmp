@@ -41,7 +41,8 @@ kuka = Manipulator(basePosition=[0,0.5,0.65],
                    initEndeffectorOrientation=tf.convertTo_pybulletQuat(quatDMP.initQuat))
 
 pb.loadURDF("table/table.urdf", basePosition=[0,0,0],useFixedBase= True,baseOrientation=pb.getQuaternionFromEuler((0,0,0)) )
-pb.loadURDF("sphere_small.urdf", basePosition= o1.initPos)
+
+sphere = pb.loadURDF("sphere_small.urdf", basePosition= o1.initPos)
 
 ## generate the demo trajectories.
 position = tf.generate3DTraj(initPos,initVel,finalPos,dmp.totaltime,dmp.t)
@@ -82,7 +83,11 @@ def velocityControl(i):
     
     pb.setJointMotorControlArray(kuka.armID ,kuka.controlJoints ,pb.VELOCITY_CONTROL,targetVelocities=commandJointVelocity)    
 print("pybullet sim starting")    
-
+smolBallScale = [0.003,0.003,0.003]
+smolBall = pb.createVisualShape(shapeType=pb.GEOM_MESH,
+                                    fileName="sphere_smooth.obj",
+                                    meshScale=smolBallScale,
+                                    rgbaColor=[1,0,0,1])
 for i in range(len(dmp.t)):
     
     kuka.setParams()    
@@ -94,6 +99,11 @@ for i in range(len(dmp.t)):
     pb_orient.append(kuka.kinematics.linkOrientation)
     pb_position.append(kuka.kinematics.linkPosition)
     # sleep(0.001)
+    if i % 100 == 0:
+        pb.createMultiBody(baseMass=0,
+                        baseInertialFramePosition=[0, 0, 0],
+                    baseVisualShapeIndex=smolBall,
+                    basePosition=np.array(kuka.kinematics.linkPosition) + np.array([0,0,-0.05]))
     pb.stepSimulation()
 
 pb_orient = np.array(pb_orient)

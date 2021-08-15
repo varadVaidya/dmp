@@ -17,3 +17,4 @@ obstacles\__pycache__
 testTelop.py
 dmp_position.mp4
 testQuat.py
+testCube.py

@@ -17,22 +17,31 @@ import pybullet_utils.transformations as trans
 
 
 totaltime = 10
+## add randomness to the obstacle structure
+numObs =6
+xlim,ylim,zlim = 0.3,0.3,0.65
 
-obsPos = np.array([
-            [0,0.03,0.66], 
-            [-0.25,0.15,0.66], 
-        ])
 
-o1 = Obstacle(numObs = 2 , n_dim = 3 , initPos = obsPos , lambda_ = 0.1)
+## randomly assign obstacle positions with x coordinate lies between -xlim and +xlim and
+# y coordinate lies between -ylim and +ylim, 
+# with z coordinate being 0.655
+obsPos = []
+for i in range(numObs):
+    obsPos.append([np.random.uniform(-xlim,xlim),np.random.uniform(-ylim,ylim),np.random.uniform(-zlim,zlim)])
+obsPos = np.array(obsPos)
+obsPos[:,2] = zlim
 
-dmp = PositionDMP(N_bfs=100,alpha= 8,cs_alpha=0.5,totaltime = totaltime,cs_tau = 1,obstacle = o1) ## ^ init the DMP class.
+
+o1 = Obstacle(numObs = numObs , n_dim = 3 , initPos = obsPos , lambda_ = 0.15)
+
+dmp = PositionDMP(N_bfs=100,alpha= 15,cs_alpha=0.5,totaltime = totaltime,cs_tau = 1,obstacle = o1) ## ^ init the DMP class.
 quatDMP = QuaternionDMP(alpha = 40, cs_alpha = 1,N_bfs=100,totaltime = totaltime)  ## ^ init the DMP quaternion class
 
 ## generate position and orientation trajectory
 initPos,initVel,finalPos = np.array([
-    [-0.4,0.2,0.69],
+    [-0.4,0.2,0.70],
     [0,0,0],
-    [0.3,-0.2,0.69],
+    [0.3,-0.2,0.70],
 ])
 
 initRPY = np.array([0,np.pi,0])
@@ -48,7 +57,7 @@ kuka = Manipulator(basePosition=[0,0.5,0.65],
 
 ## loading spheres as obstacles
 shift = [0, 0, 0]
-meshScale = [0.015, 0.015, 0.015]
+meshScale = [0.012, 0.012, 0.012]
 visualShapeId = pb.createVisualShape(shapeType=pb.GEOM_MESH,
                                     fileName="sphere_smooth.obj",
                                     meshScale=meshScale)
@@ -59,18 +68,12 @@ collisionShapeId = pb.createCollisionShape(shapeType=pb.GEOM_MESH,
 
 pb.loadURDF("table/table.urdf", basePosition=[0,0,0],useFixedBase= True,baseOrientation=pb.getQuaternionFromEuler((0,0,0)) )
 
-
-pb.createMultiBody(baseMass=1,
-                baseInertialFramePosition=[0, 0, 0],
+for i in range(len(obsPos)):
+    pb.createMultiBody(baseMass=0,
+                       baseInertialFramePosition=[0, 0, 0],
                 baseCollisionShapeIndex=collisionShapeId,
                 baseVisualShapeIndex=visualShapeId,
-                basePosition=obsPos[0])
-pb.createMultiBody(baseMass=1,
-                baseInertialFramePosition=[0, 0, 0],
-                baseCollisionShapeIndex=collisionShapeId,
-                baseVisualShapeIndex=visualShapeId,
-                basePosition=obsPos[1])
-
+                basePosition=obsPos[i])
 
 
 ## generate the demo trajectories.
@@ -112,14 +115,22 @@ def velocityControl(i):
     
     pb.setJointMotorControlArray(kuka.armID ,kuka.controlJoints ,pb.VELOCITY_CONTROL,targetVelocities=commandJointVelocity)    
 print("pybullet sim starting")    
-
+smolBallScale = [0.003,0.003,0.003]
+smolBall = pb.createVisualShape(shapeType=pb.GEOM_MESH,
+                                    fileName="sphere_smooth.obj",
+                                    meshScale=smolBallScale,
+                                    rgbaColor=[1,0,0,1])
 for i in range(len(dmp.t)):
     
     kuka.setParams()
     velocityControl(i)
     pb_orient.append(kuka.kinematics.linkOrientation)
     pb_position.append(kuka.kinematics.linkPosition)
-    
+    if i % 100 == 0:
+        pb.createMultiBody(baseMass=0,
+                        baseInertialFramePosition=[0, 0, 0],
+                    baseVisualShapeIndex=smolBall,
+                    basePosition=np.array(kuka.kinematics.linkPosition) + np.array([0,0,-0.05]))
     pb.stepSimulation()
 
 pb_orient = np.array(pb_orient)
