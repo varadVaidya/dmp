@@ -3,18 +3,14 @@ import matplotlib.pyplot as plt
 import sys
 sys.path.append( sys.path[0] +'/../..')
 from positionDMP.dmp_position import PositionDMP
+from utils.manipulation.manipulator import Manipulator
+
 from time import sleep
 
 import pybullet as pb
 import pybullet_data
 
-pb.connect(pb.GUI)
-pb.setAdditionalSearchPath(pybullet_data.getDataPath())
 
-
-kuka = pb.loadURDF("kuka_iiwa/model.urdf",[0,0,0],useFixedBase=True)
-
-plane = pb.loadURDF("plane.urdf")
 
 dmp = PositionDMP(N_bfs=1000,alpha= 10,cs_alpha=0.5,totaltime = 15,n_dim=7,cs_tau = 1) ## ^ init the DMP class.
 # position = np.array([np.sin(dmp.t),np.cos(dmp.t),np.sin(dmp.t) * np.cos(dmp.t)]).T ## ^ set the desired position.
@@ -49,21 +45,25 @@ ax[2].legend()
 
 
 plt.show()
-controlJoints = []
 
-totalJoints = pb.getNumJoints(kuka)
-for i in range(totalJoints):
-    jointInfo = pb.getJointInfo(kuka,i)
-            
-    if jointInfo[2]==0:
-        #append the joints we can control
-        controlJoints.append(i)
-print("control",controlJoints)
+kuka = Manipulator()
+sleep(10)
 i = 0 ## init the counter.
+smolBallScale = [0.009,0.009,0.009]
+smolBall = pb.createVisualShape(shapeType=pb.GEOM_MESH,
+                                    fileName="sphere_smooth.obj",
+                                    meshScale=smolBallScale,
+                                    rgbaColor=[1,0,0,1])
 for i in range(len(dmp_position)):
     
-    pb.setJointMotorControlArray(kuka,controlJoints,pb.POSITION_CONTROL,dmp_position[i])
+    kuka.setParams()
+    pb.setJointMotorControlArray(kuka.armID,kuka.controlJoints,pb.POSITION_CONTROL,dmp_position[i])
+    if i % 100 == 0:
+        pb.createMultiBody(baseMass=0,
+                        baseInertialFramePosition=[0, 0, 0],
+                    baseVisualShapeIndex=smolBall,
+                    basePosition=np.array(kuka.kinematics.linkPosition))
+
     pb.stepSimulation()
-    sleep(0.01)
-    i+=1
+    
     pass

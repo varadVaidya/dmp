@@ -43,7 +43,7 @@ kuka = Manipulator(basePosition=[0,0.5,0.65],
 pb.loadURDF("table/table.urdf", basePosition=[0,0,0],useFixedBase= True,baseOrientation=pb.getQuaternionFromEuler((0,0,0)) )
 
 sphere = pb.loadURDF("sphere_small.urdf", basePosition= o1.initPos)
-
+sleep(5)
 ## generate the demo trajectories.
 position = tf.generate3DTraj(initPos,initVel,finalPos,dmp.totaltime,dmp.t)
 rotation = tf.generateQuaternionTraj(quatDMP.initQuat,quatDMP.goalQuat,quatDMP.t/quatDMP.totaltime)

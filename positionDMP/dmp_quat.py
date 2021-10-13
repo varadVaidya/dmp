@@ -131,6 +131,7 @@ class QuaternionDMP():
 if __name__ == "__main__":
     
     import matplotlib.pyplot as plt
+    plt.style.use('science')
     quatDMP = QuaternionDMP(alpha = 10, cs_alpha = 2,N_bfs=100,totaltime = 5)
     quatDMP.initQuat = qt.array([1,0,-1,0]).normalized
     quatDMP.goalQuat = qt.array([1,2,1,-1]).normalized

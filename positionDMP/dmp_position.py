@@ -235,8 +235,8 @@ if __name__ =="__main__":
     
     ## doesnt work anymore. refer examples/cartesianDMP.py
     import matplotlib.pyplot as plt
-    
-    dmp = PositionDMP(N_bfs=20,alpha= 10,cs_alpha=2,totaltime = 5)
+    plt.style.use('science')
+    dmp = PositionDMP(N_bfs=15,alpha= 30,cs_alpha=2,totaltime = 3)
     #position = np.array([np.polyval([1,-2,3,4],dmp.t),np.polyval([-1,2,-3,4],dmp.t),np.polyval([-1,2,-3,4],dmp.t)]).T
     position = np.array([np.sin(dmp.t),np.sin(dmp.t),np.sin(dmp.t)]).T
 
@@ -250,9 +250,9 @@ if __name__ =="__main__":
     
     euclidiean_diff = position - dmp_position
     plt.figure()
-    plt.plot(dmp.t,euclidiean_diff[:,0],label="error between the trajectories")
-    plt.plot(dmp.t,position[:,0],label="given position")
-    plt.plot(dmp.t,dmp_position[:,0],label="dmp position")
+    plt.plot(dmp.t,euclidiean_diff[:,0],label="Error")
+    plt.plot(dmp.t,position[:,0],label="Demo")
+    plt.plot(dmp.t,dmp_position[:,0],label="DMP Position")
     plt.legend()
     plt.show()
     

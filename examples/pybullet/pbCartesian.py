@@ -2,6 +2,7 @@ import pybullet as pb
 import pybullet_data
 import numpy as np
 import matplotlib.pyplot as plt
+plt.style.use('science')
 import sys
 sys.path.append( sys.path[0] +'/../..')
 from positionDMP.dmp_position import PositionDMP
@@ -23,13 +24,13 @@ quatDMP = QuaternionDMP(alpha = 40, cs_alpha = 1,N_bfs=100,totaltime = totaltime
 
 ## generate position and orientation trajectory
 initPos,initVel,finalPos = np.array([
-    [0.4,0.4,0.9],
-    [0,0,0],
-    [-0.2,-0.6,0.9],
+    [0.4,-0.2,0.8],
+    [0,0.05,-0.03],
+    [-0.2,0.4,1],
 ])
 
-quatDMP.initQuat = qt.array([0,0,0,1]).normalized
-quatDMP.goalQuat = qt.array([0.1,0.1,0.1,0.9]).normalized
+quatDMP.initQuat = qt.array([ -0.17494102, 0.68512454 , -0.17494102 , +0.68512454]).normalized
+quatDMP.goalQuat = qt.array([0.2474,-0.1,0.1,0.9689]).normalized
 
 ## init pybullet env
 # kuka = Manipulator(initEndeffectorPos= initPos,initEndeffectorOrientation=
@@ -75,7 +76,11 @@ def velocityControl(i):
     
     pb.setJointMotorControlArray(kuka.armID ,kuka.controlJoints ,pb.VELOCITY_CONTROL,targetVelocities=commandJointVelocity)    
 print("pybullet sim starting")    
-
+smolBallScale = [0.009,0.009,0.009]
+smolBall = pb.createVisualShape(shapeType=pb.GEOM_MESH,
+                                    fileName="sphere_smooth.obj",
+                                    meshScale=smolBallScale,
+                                    rgbaColor=[1,0,0,1])
 for i in range(len(dmp.t)):
     
     kuka.setParams()    
@@ -86,24 +91,29 @@ for i in range(len(dmp.t)):
     velocityControl(i)
     pb_orient.append(kuka.kinematics.linkOrientation)
     pb_position.append(kuka.kinematics.linkPosition)
+    if i % 100 == 0:
+        pb.createMultiBody(baseMass=0,
+                        baseInertialFramePosition=[0, 0, 0],
+                    baseVisualShapeIndex=smolBall,
+                    basePosition=np.array(kuka.kinematics.linkPosition))
     pb.stepSimulation()
 
 pb_orient = np.array(pb_orient)
 pb_position = np.array(pb_position)
-pf.plotPosition(dmp.t,position,dmp_position,pb_position)
-pf.plotQuaternions(quatDMP.t,rotation.ndarray,dmp_quaternion.ndarray,pb_orient) ## pass the md array version of the quaternion class matrix
+# pf.plotPosition(dmp.t,position,dmp_position,pb_position)
+# pf.plotQuaternions(quatDMP.t,rotation.ndarray,dmp_quaternion.ndarray,pb_orient) ## pass the md array version of the quaternion class matrix
 
-## ? 3D plot.
+# # ## ? 3D plot.
 
-fig3D = plt.figure()
-ax3D = plt.axes(projection = '3d')
-ax3D.plot3D(position[:,0],position[:,1],position[:,2],label='Demo')
-ax3D.plot3D(dmp_position[:,0],dmp_position[:,1],dmp_position[:,2],label='DMP')
-ax3D.set_xlabel('X')
-ax3D.set_ylabel('Y')
-ax3D.set_zlabel('Z')
-ax3D.legend()
+# fig3D = plt.figure()
+# ax3D = plt.axes(projection = '3d')
+# ax3D.plot3D(position[:,0],position[:,1],position[:,2],label='Demo')
+# ax3D.plot3D(dmp_position[:,0],dmp_position[:,1],dmp_position[:,2],label='DMP')
+# ax3D.set_xlabel('X')
+# ax3D.set_ylabel('Y')
+# ax3D.set_zlabel('Z')
+# ax3D.legend()
 
-plt.show()
+# plt.show()
 
     

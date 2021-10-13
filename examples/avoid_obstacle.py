@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+plt.style.use('science')
 import sys
 sys.path.append( sys.path[0] +'/..')
 from positionDMP.dmp_position import PositionDMP
@@ -9,13 +10,13 @@ import utils.plotFuncs as pf
 
 ## init the obstacle
 extrapolteFlag = False
-o1 = Obstacle(initPos=np.array([0,0,0.7]) ,lambda_ = 0.5)
+o1 = Obstacle(initPos=np.array([0,0,0]) ,lambda_ = 5)
 dmp = PositionDMP(N_bfs=100,alpha= 30,cs_alpha=5,totaltime = 5,obstacle = o1,extrapolate= extrapolteFlag) ## ^ init the DMP class.
 
 initPos,initVel,finalPos = np.array([
-    [-0.3,0.2,0.7],
-    [0,0,0],
-    [0.3,-0.2,0.701],
+    [3,2,3],
+    [-1,0,-1.3],
+    [-4,-5,-3],
 ])
 
 position = generate3DTraj(initPos,initVel,finalPos,dmp.totaltime,dmp.t)
@@ -27,7 +28,7 @@ euclidiean_norm = np.linalg.norm((position - dmp_position) , axis= 1) ## ^ eucli
 
 ## plot stuff...
 pf.plotPosition(dmp.t,position,dmp_position)
-pf.animatePositionDMP3D(dmp.t,position,dmp_position,o1.obstaclePos)
+# pf.animatePositionDMP3D(dmp.t,position,dmp_position,o1.obstaclePos)
 
 ## ? 3D plot.
 

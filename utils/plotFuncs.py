@@ -121,6 +121,7 @@ def animatePositionDMP2D(time,position,dmp_position,obstaclePosition = None,save
             return line,line2
         
         ani = animation.FuncAnimation(fig, animate, init_func=init,interval = 1,frames= len(time),repeat=False)
+        ani.save("anim.png", writer='imagemagick')
         plt.show()    
     
     if obstaclePosition is not None:
@@ -167,7 +168,6 @@ def animatePositionDMP2D(time,position,dmp_position,obstaclePosition = None,save
             line.set_data(posX,posY)
             line2.set_data(dmpPosX,dmpPosY)
             line3.set_data(obsX,obsY)
-            
             return line,line2,line3
         
         ani = animation.FuncAnimation(fig, animate, init_func=init,interval = 1,frames= len(time),repeat=False)

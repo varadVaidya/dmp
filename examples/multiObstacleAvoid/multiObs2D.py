@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+plt.style.use('science')
 import sys
 sys.path.append( sys.path[0] +'/../..')
 from positionDMP.dmp_position import PositionDMP

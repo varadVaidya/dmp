@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+plt.style.use('science')
 import sys
 sys.path.append( sys.path[0] +'/..')
 from positionDMP.dmp_position import PositionDMP
@@ -8,8 +9,8 @@ from utils.trajFuncs import generate3DTraj
 dmp = PositionDMP(N_bfs=100,alpha= 30,cs_alpha=3,totaltime = 5,cs_tau = 1) ## ^ init the DMP class.
 
 initPos,initVel,finalPos = np.array([
-    [0,-1,0],
-    [1,-1,2],
+    [-3,-1,1],
+    [0,0,-2],
     [2,3,2],
 ])
 #position = np.array([np.sin(dmp.t),np.cos(dmp.t),np.sin(dmp.t) * np.cos(dmp.t)]).T ## ^ set the desired position.
@@ -39,12 +40,11 @@ ax[1].set_ylabel('Y')
 ax[2].plot(dmp.t,position[:,2],label='Demo')
 ax[2].plot(dmp.t,dmp_position[:,2],label='DMP')
 ax[2].set_xlabel('t')
-ax[2].set_ylabel('z')
+ax[2].set_ylabel('Z')
 ax[2].legend()
 
 ax[3].plot(dmp.t,euclidiean_norm,label='Error Norm')
 ax[3].legend()
-
 ## ? 3D plot.
 
 fig3D = plt.figure()
@@ -55,5 +55,4 @@ ax3D.set_xlabel('X')
 ax3D.set_ylabel('Y')
 ax3D.set_zlabel('Z')
 ax3D.legend()
-
 plt.show()

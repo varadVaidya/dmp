@@ -6,7 +6,7 @@ class VolumetricObstacle():
     
     ##contains the parameters of the of volumetric obstacle.
     
-    def __init__(self,center,axes,n_dim = 3 , initPos = None ,initVel = None,lambda_ = 1,beta = 2 , eta = 0.5):
+    def __init__(self,center,axes,n_dim = 3,lambda_ = 1,beta = 2 , eta = 0.5):
         
         self.n_dim = n_dim
         
@@ -17,22 +17,17 @@ class VolumetricObstacle():
         if len(center) != len(axes):
             raise ValueError("center and axes must be same dimension")
         
+        if len(axes) != n_dim:
+            raise ValueError("center and axes are not the same dimension as the obstacle dimension")
         
         """
         if initPos is None then assign both the initial position and velocity to be zero of array size n_dim
         if initPos is not None then assign the initial position and velocity to be the input values
         """
-        if initPos is None:
-            self.initPos = np.zeros(self.n_dim)
-            self.initVel = np.zeros(self.n_dim)
-        else:
-            self.initPos = initPos
-            
-            if initVel is None:
-                self.initVel = np.zeros(self.n_dim)
-            else:
-                self.initVel = initVel
+        ### !!!!! INIT POS AND VELOCIY are not used in the code !!!!! will be replaced with center and axes.
         
+        self.initPos = center
+        self.initVel = np.zeros(n_dim)
         
         self.currentPos = self.initPos.copy() ## current position of the obstacle
         self.currentVel = self.initVel.copy() ## current velocity of the obstacle
@@ -90,9 +85,9 @@ class VolumetricObstacle():
     
     def cos_theta(self,X,V):
         """
-        returns the cosine of the angle between the velocity and the gradient of the iso potential field
+        returns the cosine of the angle between the velocity and the gradient of the iso potential field. clip the value of it between -1 and 1.
         """
-        return np.dot( self.grad_Cx(X) , V ) / ( self.abs_grad_C_x(X) * np.linalg.norm(V) )
+        return np.clip(np.dot(self.grad_Cx(X),V)/(np.linalg.norm(V)*self.abs_grad_C_x(X)),-1,1)
     
     def grad_cos_theta(self,X,V):
         """
@@ -119,9 +114,9 @@ class VolumetricObstacle():
             return 0
         
         cos_theta = self.cos_theta(X,V)
-        print(cos_theta,": costheta")
+        # print(cos_theta,": costheta")
         angle = np.arccos( self.cos_theta(X,V) )
-        print(angle)
+        # print(angle)
         apply_force = angle > np.pi/2 and angle <= np.pi
         
         if apply_force:
@@ -148,8 +143,7 @@ class VolumetricObstacle():
 if __name__ == "__main__":
     
     volObs = VolumetricObstacle(center =  np.array([0,0,0]),
-                                axes = np.array([1,1,1]),
-                                initPos= np.array([1,1,0]))
+                                axes = np.array([1,1,1]))
     
     
     V = np.array([1.1,1.1,1.1])

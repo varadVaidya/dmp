@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+plt.style.use('science')
 import sys
 sys.path.append( sys.path[0] +'/..')
 from positionDMP.dmp_position import PositionDMP
@@ -9,18 +10,19 @@ import utils.plotFuncs as pf
 
 extrapolteFlag = False
 
-o1 = Obstacle(initPos=np.array([0,0]),initVel= np.array([-0.09,-0.09]),n_dim=2,lambda_= 10)
+o1 = Obstacle(initPos=np.array([0,0]),initVel= np.array([0,0]),n_dim=2,lambda_= 30)
 
-dmp = PositionDMP(N_bfs=100,alpha= 50,cs_alpha=1,totaltime = 5,cs_tau = 1,n_dim = 2,obstacle = o1,extrapolate = extrapolteFlag) ## ^ init the DMP class.
+# dmp = PositionDMP(N_bfs=100,alpha= 50,cs_alpha=1,totaltime = 5,cs_tau = 1,n_dim = 2,obstacle = o1,extrapolate = extrapolteFlag) ## ^ init the DMP class.
+dmp = PositionDMP(N_bfs=100,alpha= 50,cs_alpha=1,totaltime = 5,cs_tau = 1,n_dim = 2,obstacle= o1) ## ^ init the DMP class.
 
 # initPos,initVel,finalPos = np.array([
-#     [-0.3,0.2],
+#     [-0.3,0.2],``
 #     [0.01,-0.01],
 #     [0.3,-0.2],
 # ])
 initPos,initVel,finalPos = np.array([
     [-3,2],
-    [-1,0],
+    [-0.5,0],
     [3,-2],
 ])
 # initPos,initVel,finalPos = np.array([
@@ -63,5 +65,5 @@ ax2.plot(o1.initPos[0],o1.initPos[1],'ro',label='obstacle')
 ax2.legend()
 plt.show()
 
-pf.animatePositionDMP2D(dmp.t,position,dmp_position,obstaclePosition= o1.obstaclePos,saveVideo=True)   
+# pf.animatePositionDMP2D(dmp.t,position,dmp_position,obstaclePosition= o1.obstaclePos,saveVideo=True)   
 
