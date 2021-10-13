@@ -3,7 +3,7 @@
 This project explores the concept of Dynamic Movement Primitives (DMPs), its extensions to encode Orientations and to avoid single and multiple
 point-like obstacles. 
 
-This paper is an mixed implementation of the following papers:
+This project is an mixed implementation of the following papers:
 
 1. [Dynamical Movement Primitives: Learning Attractor Models for Motor Behaviors](https://www.researchgate.net/publication/2824078_Dynamical_Movement_Primitives_Learning_Attractor_Models_for_Motor_Behaviors)
 
