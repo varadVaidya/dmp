@@ -1,5 +1,5 @@
 # DMP
-## currently "dynamical_systems" is archived. 
+## repo under construction
 
 ### Ref.
 iiwa description from : pybullet data
